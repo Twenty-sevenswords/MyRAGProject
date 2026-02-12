@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class MyRAGProject {
-
     public static void main(String[] args) {
-        SpringApplication.run(SmartPaiApplication.class, args);
+        SpringApplication.run(MyRAGProject.class, args);
     }
 
 }
