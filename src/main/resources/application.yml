@@ -2,7 +2,7 @@ server:
   port: 8081 # 指定端口号
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/PaiSmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://47.95.122.180:3306/PaiSmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   data:
     redis:
-      host: localhost
+      host: 47.95.122.180
       port: 6379
       #password: PaiSmart2025
   servlet:
@@ -23,40 +23,40 @@ spring:
       enabled: true
       max-file-size: 50MB # 单个文件的最大大小
       max-request-size: 100MB # 整个请求的最大大小
-#  kafka:
-#    enabled: true  # 启用 Kafka
-#    bootstrap-servers: 127.0.0.1:9092 # Kafka 服务器地址
-#    producer:
-#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#      acks: all
-#      retries: 3
-#      enable-idempotence: true
-#      transactional-id-prefix: file-upload-tx-
-#      properties:
-#        client.dns.lookup: use_all_dns_ips
-#    consumer:
-#      group-id: file-processing-group # 消费者组 ID
-#      auto-offset-reset: earliest
-#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-#      properties:
-#        spring.json.trusted.packages: "*" # 允许反序列化的包
-#        client.dns.lookup: use_all_dns_ips
-#    topic:
-#      file-processing: file-processing-topic1 # 新增的 Topic 配置
-#      dlt: file-processing-dlt # 死信队列主题
-#  webflux:
-#    client:
-#      max-in-memory-size: 16MB  # 增加响应大小限制
-#  codec:
-#    max-in-memory-size: 16MB    # 增加编解码大小限制
+  #  kafka:
+  #    enabled: true  # 启用 Kafka
+  #    bootstrap-servers: 127.0.0.1:9092 # Kafka 服务器地址
+  #    producer:
+  #      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  #      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  #      acks: all
+  #      retries: 3
+  #      enable-idempotence: true
+  #      transactional-id-prefix: file-upload-tx-
+  #      properties:
+  #        client.dns.lookup: use_all_dns_ips
+  #    consumer:
+  #      group-id: file-processing-group # 消费者组 ID
+  #      auto-offset-reset: earliest
+  #      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  #      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  #      properties:
+  #        spring.json.trusted.packages: "*" # 允许反序列化的包
+  #        client.dns.lookup: use_all_dns_ips
+  #    topic:
+  #      file-processing: file-processing-topic1 # 新增的 Topic 配置
+  #      dlt: file-processing-dlt # 死信队列主题
+  #  webflux:
+  #    client:
+  #      max-in-memory-size: 16MB  # 增加响应大小限制
+  #  codec:
+  #    max-in-memory-size: 16MB    # 增加编解码大小限制
 
-# application.yml 中仅保留/修改以下Kafka配置
+  # application.yml 中仅保留/修改以下Kafka配置
 
   kafka:
     enabled: true
-    bootstrap-servers: 127.0.0.1:9092
+    bootstrap-servers: 47.95.122.180:9092
     # 生产者核心配置：限制消息大小+超时（关键）
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -72,6 +72,9 @@ spring:
       linger-ms: 5       # 等待5ms凑批次，减少请求数
       # 核心3：添加超时，避免无限等待
       request-timeout-ms: 30000  # 请求超时30秒
+      # ====================== 只新增这2项 ======================
+      delivery-timeout-ms: 120000
+      transaction.abort.timed.out.transaction.cleanup.interval.ms: 10000
       properties:
         client.dns.lookup: use_all_dns_ips
         # 序列化兜底：避免空bean序列化异常
@@ -79,6 +82,10 @@ spring:
         # 连接超时：防止连接卡住
         socket.connection.timeout.ms: 10000
         socket.receive.buffer.bytes: 1048576
+        #        26.4.7新增三行
+        transaction.timeout.ms: 40000
+        transaction.max.timeout.ms: 180000
+        max.in.flight.requests.per.connection: 1
     # 消费者配置：限制拉取大小+超时
     consumer:
       group-id: file-processing-group
@@ -99,11 +106,13 @@ spring:
       properties:
         request.timeout.ms: 30000
         retry.backoff.ms: 1000
+        # ====================== 新增 ======================
+        transaction.max.timeout.ms: 180000
     topic:
       file-processing: file-processing-topic1
       dlt: file-processing-dlt
 
-# 补充：全局超时配置，防止WebFlux/Kafka等组件阻塞
+  # 补充：全局超时配置，防止WebFlux/Kafka等组件阻塞
 
   webflux:
     client:
@@ -114,11 +123,11 @@ spring:
     max-in-memory-size: 16MB
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://47.95.122.180:9000
   accessKey: minio
   secretKey: minio123456
   bucketName: uploads
-  publicUrl: http://localhost:9090
+  publicUrl: http://47.95.122.180:9090
 
 jwt:
   secret-key: "PXrQbuCwXwOZzkML/Vm2S5rSwt1iybvmKtGDzVEu+Hc="
@@ -137,11 +146,11 @@ file:
     max-memory-threshold: 0.8  # 80% 内存阈值
 
 elasticsearch:
-  host: localhost       # Elasticsearch主机地址
+  host: 47.95.122.180       # Elasticsearch主机地址
   port: 9200            # Elasticsearch端口号
   scheme: http         # 协议（http/https）
-  username: elastic     # 安装后生成的默认用户
-  password: fZZh4IzlA6*U1afm68W0
+#  username: elastic     # 安装后生成的默认用户
+#  password: fZZh4IzlA6*U1afm68W0
 
 
 logging:
@@ -150,7 +159,9 @@ logging:
     org.springframework.boot.autoconfigure.web.servlet: DEBUG
     org.springframework.security: DEBUG
     com.yizhaoqi.smartpai.service: DEBUG
+#    com.yizhaoqi.smartpai.service.agent: DEBUG
     io.minio: DEBUG
+
 
 log4j:
   logger:
@@ -160,9 +171,9 @@ log4j:
 
 deepseek:
   api:
-    url: http://localhost:11434/v1 # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
-    model: deepseek-r1:8b  # 本地: deepseek-r1:7b, 官方: deepseek-chat deepseek-ai/DeepSeek-R1
-    key:  #sk-de9e2b4266524607af48235d1de251e0 # DeepSeek API Key 如果是本地就为空
+    url: https://dashscope.aliyuncs.com/compatible-mode/v1 # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
+    model: qwen-turbo  # 本地: deepseek-r1:7b, 官方: deepseek-chat deepseek-ai/DeepSeek-R1
+    key: sk-c502ba1f6f034be9850462418960a7a4 # DeepSeek API Key 如果是本地就为空
 #deepseek:
 #  api:
 #    url: https://api.siliconflow.cn/v1/chat/completions
@@ -172,8 +183,8 @@ deepseek:
 embedding:
   api:
     url: https://dashscope.aliyuncs.com/compatible-mode/v1
-#    key: a3dcfc9c-6bd7-4121-8c08-75ae7ea0e94f   # 填入通义千问API key
-    key: 保密
+    #    key: a3dcfc9c-6bd7-4121-8c08-75ae7ea0e94f   # 填入通义千问API key
+    key: sk-c502ba1f6f034be9850462418960a7a4
     model: text-embedding-v4
     dimension: 2048  # 指定向量维度
 
@@ -193,3 +204,59 @@ ai:
     temperature: 0.3
     max-tokens: 2000
     top-p: 0.9
+  agent:
+    intent:
+      template: |
+        分析用户意图，输出JSON格式：
+        {
+            "intent": "SEARCH|COMPARE|SUMMARIZE|CHAT|UNKNOWN",
+            "keywords": ["关键词1", "关键词2"],
+            "entities": {"文件名": "", "时间": ""},
+            "complexity": 1-5,
+            "needsHistory": true/false,
+            "confidence": 0.0-1.0
+        }
+        
+        用户消息：{message}
+    work:
+      template: |
+        基于以下文档片段回答问题：
+        {context}
+        
+        问题：{message}
+        
+        要求：
+        1. 直接回答问题，简明扼要
+        2. 引用文档内容时，必须在句末标注来源，格式为【来源#编号: 文件名】
+        3. 例如：该文档是面试记录【来源#1: Cvte广州ai开发一面】
+        4. 若无足够信息，请明确说明'暂无相关信息'
+      simple-search-template: "为您找到{count}条相关文档片段：\n{results}"
+      source-format: "【来源#{index}: {fileName}】\n{content}"
+    check:
+      template: |
+        你是一个回答质量检查员。请评估以下回答是否合格。
+        
+        【用户问题】
+        {question}
+        
+        【AI回答】
+        {answer}
+        
+        【评估标准】
+        1. 相关性：回答是否针对用户问题
+        2. 准确性：回答内容是否有事实依据（非编造）
+        3. 完整性：回答是否充分解答了问题
+        4. 可读性：回答是否清晰、有条理
+        
+        【输出格式】
+        请严格按照以下JSON格式输出，不要有多余内容：
+        {"passed": true/false, "score": 1-10, "reason": "简短理由"}
+        
+        其中：
+        - passed: true表示合格，false表示不合格
+        - score: 1-10分，6分及以上为合格
+        - reason: 一句话说明判定理由
+      source-marker: "【"
+      min-reply-length: 10
+      max-reply-length: 2000
+      pass-score-threshold: 6

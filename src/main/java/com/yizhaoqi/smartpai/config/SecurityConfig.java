@@ -48,7 +48,7 @@ public class SecurityConfig {
                             // 允许 WebSocket 连接
                             .requestMatchers("/chat/**", "/ws/**").permitAll()
                             // 允许登录注册接口
-                            .requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll()
+                            .requestMatchers("/api/v1/users/register", "/api/v1/users/login","/api/v1/users/me").permitAll()
                             // 允许测试接口
                             .requestMatchers("/api/v1/test/**").permitAll()
                             // 文件上传和提问相关接口 - 普通用户和管理员都可访问

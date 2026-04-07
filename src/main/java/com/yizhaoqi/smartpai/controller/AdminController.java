@@ -90,7 +90,7 @@ public class AdminController {
         
         try {
             // 这里应该调用知识库管理服务来处理文档
-            // knowledgeService.addDocument(file, description);
+//            knowledgeService.addDocument(file, description);
             
             Map<String, String> response = new HashMap<>();
             response.put("message", "文档已成功添加到知识库");

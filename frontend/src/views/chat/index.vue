@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import ChatList from './modules/chat-list.vue';
-import InputBox from './modules/input-box.vue';
+import ChatList from './modules/chat-list.vue'
+import InputBox from './modules/input-box.vue'
+// Agent调试面板（自带触发按钮）
+import AgentDebugPanel from './modules/agent-debug-panel.vue'
 </script>
 
 <template>
-  <div class="flex-col gap-4">
+  <div class="flex-col gap-4 relative">
     <ChatList />
     <InputBox />
+    <!-- Agent调试面板（自带触发按钮） -->
+    <AgentDebugPanel />
   </div>
 </template>
 

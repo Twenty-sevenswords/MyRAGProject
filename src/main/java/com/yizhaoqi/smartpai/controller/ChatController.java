@@ -1,17 +1,22 @@
 package com.yizhaoqi.smartpai.controller;
 
+import com.yizhaoqi.smartpai.entity.ChatContext;
+import com.yizhaoqi.smartpai.entity.ChatMessage;
 import com.yizhaoqi.smartpai.handler.ChatWebSocketHandler;
+import com.yizhaoqi.smartpai.service.ChatContextService;
 import com.yizhaoqi.smartpai.service.ChatHandler;
 import com.yizhaoqi.smartpai.utils.LogUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -20,9 +25,11 @@ import java.util.Map;
 public class ChatController extends TextWebSocketHandler {
 
     private final ChatHandler chatHandler;
+    private final ChatContextService contextService;
 
-    public ChatController(ChatHandler chatHandler) {
+    public ChatController(ChatHandler chatHandler, ChatContextService contextService) {
         this.chatHandler = chatHandler;
+        this.contextService = contextService;
     }
 
     @Override
@@ -77,5 +84,38 @@ public class ChatController extends TextWebSocketHandler {
                 "data", null
             ));
         }
+    }
+    
+    /**
+     * 调试接口：获取指定用户的对话上下文
+     */
+    @GetMapping("/debug/context/{userId}")
+    public ResponseEntity<?> getDebugContext(@PathVariable String userId) {
+        String sessionId = "session:" + userId;
+        ChatContext context = contextService.getContext(sessionId);
+        
+        if (context == null) {
+            return ResponseEntity.ok(Map.of(
+                "code", 200,
+                "message", "上下文不存在",
+                "data", Map.of(
+                    "sessionId", sessionId,
+                    "exists", false
+                )
+            ));
+        }
+        
+        List<ChatMessage> messages = context.getAllHistory();
+        return ResponseEntity.ok(Map.of(
+            "code", 200,
+            "message", "获取上下文成功",
+            "data", Map.of(
+                "sessionId", sessionId,
+                "exists", true,
+                "userId", context.getUserId(),
+                "messageCount", messages.size(),
+                "messages", messages
+            )
+        ));
     }
 }

@@ -11,8 +11,8 @@
     <groupId>com.yizhaoqi</groupId>
     <artifactId>MyRAGProject</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SmartPAI</name>
-    <description>SmartPAI</description>
+    <name>MyRAGProject</name>
+    <description>MyRAGProject</description>
     <url/>
     <licenses>
         <license/>
@@ -167,6 +167,13 @@
             <version>2.10.1</version>
         </dependency>
 
+        <!-- Apache Commons Text (用于文本相似度计算) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.11.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -179,6 +186,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
