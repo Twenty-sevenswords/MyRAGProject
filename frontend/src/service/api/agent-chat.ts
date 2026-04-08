@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 
 // Agent事件类型
 export interface AgentEvent {
-  type: 'AGENT_START' | 'AGENT_COMPLETE' | 'FINAL_REPLY' | 'ERROR' | 'FALLBACK'
+  type: 'start' | 'complete' | 'stream' | 'final' | 'error' | 'fallback'
   agent: string
   message: string
   data?: Record<string, any>

@@ -49,12 +49,14 @@ watch(agentEvents, (events) => {
   const lastEvent = events[events.length - 1];
   const assistant = list.value[list.value.length - 1];
   
-  // 注意：后端事件类型是小写的
+  // 注意：后端事件类型是小写的 start, complete, stream, final, error
   if (lastEvent.type === 'start') {
     if (assistant?.role === 'assistant') {
       assistant.status = 'loading';
       assistant.content = `🔄 ${lastEvent.agent}: ${lastEvent.message}...`;
     }
+  } else if (lastEvent.type === 'stream') {
+    // 流式数据已经在 store 中处理，这里不需要重复处理
   }
 }, { deep: true });
 

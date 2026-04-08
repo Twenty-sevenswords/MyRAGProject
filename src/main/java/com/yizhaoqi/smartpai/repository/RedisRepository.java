@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Repository
@@ -43,6 +44,27 @@ public class RedisRepository {
     }
 
     // ========== 新增：Agent记忆方法 ==========
+
+    /**
+     * 通用获取方法
+     */
+    public Object get(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 通用设置方法（带过期时间）
+     */
+    public void set(String key, Object value, long timeout, TimeUnit unit) {
+        redisTemplate.opsForValue().set(key, value, Duration.ofMillis(unit.toMillis(timeout)));
+    }
+
+    /**
+     * 通用删除方法
+     */
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
 
     public void saveMemory(MemoryEntry entry) {
         String key = String.format("pai:memory:%s:%s",

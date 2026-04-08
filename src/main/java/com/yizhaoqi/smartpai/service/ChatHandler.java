@@ -85,8 +85,26 @@ public class ChatHandler {
             }
             
             // 3. 执行带权限过滤的混合搜索
+            logger.info("开始执行带权限搜索 - 查询: '{}', 用户ID: '{}'", userMessage, userId);
+            
+            // 【调试用】如果需要临时禁用权限过滤，取消下面这行的注释
+            // List<SearchResult> searchResults = searchService.search(userMessage, 5);
+            
             List<SearchResult> searchResults = searchService.searchWithPermission(userMessage, userId, 5);
-            logger.debug("搜索结果数量: {}", searchResults.size());
+            logger.info("搜索结果数量: {}", searchResults.size());
+            if (searchResults.isEmpty()) {
+                logger.warn("⚠️ 未找到相关文档！可能原因：");
+                logger.warn("  1. 知识库中没有与 '{}' 相关的内容", userMessage);
+                logger.warn("  2. 用户 '{}' 没有权限访问相关文档", userId);
+                logger.warn("  3. Elasticsearch 索引 'knowledge_base' 为空或未正确初始化");
+            } else {
+                logger.info("✅ 找到 {} 条相关文档", searchResults.size());
+                for (int i = 0; i < Math.min(3, searchResults.size()); i++) {
+                    SearchResult r = searchResults.get(i);
+                    logger.info("  [{}] 文件: {}, 分数: {:.4f}", 
+                        i + 1, r.getFileName(), r.getScore());
+                }
+            }
             
             // 4. 构建RAG上下文
             String ragContext = buildContext(searchResults);

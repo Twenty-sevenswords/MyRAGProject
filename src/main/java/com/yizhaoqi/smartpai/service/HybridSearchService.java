@@ -61,16 +61,19 @@ public class HybridSearchService {
      * @return 搜索结果列表
      */
     public List<SearchResult> searchWithPermission(String query, String userId, int topK) {
-        logger.debug("开始带权限搜索，查询: {}, 用户ID: {}", query, userId);
+        logger.info("========== 开始带权限搜索 ==========");
+        logger.info("查询: '{}'", query);
+        logger.info("用户ID: '{}'", userId);
+        logger.info("返回数量: {}", topK);
         
         try {
             // 获取用户有效的组织标签（包含层级关系）
             List<String> userEffectiveTags = getUserEffectiveOrgTags(userId);
-            logger.debug("用户 {} 的有效组织标签: {}", userId, userEffectiveTags);
+            logger.info("用户 '{}' 的有效组织标签: {}", userId, userEffectiveTags);
 
             // 获取用户的数据库ID用于权限过滤
             String userDbId = getUserDbId(userId);
-            logger.debug("用户 {} 的数据库ID: {}", userId, userDbId);
+            logger.info("用户 '{}' 的数据库ID: '{}'", userId, userDbId);
 
             // 生成查询向量
             final List<Float> queryVector = embedToVectorList(query);

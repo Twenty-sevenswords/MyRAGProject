@@ -2,6 +2,7 @@ package com.yizhaoqi.smartpai.config;
 
 import com.yizhaoqi.smartpai.handler.ChatWebSocketHandler;
 import com.yizhaoqi.smartpai.handler.MultiAgentWebSocketHandler;
+import com.yizhaoqi.smartpai.handler.McpWebSocketHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -17,15 +18,23 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Autowired
     private MultiAgentWebSocketHandler multiAgentWebSocketHandler;
     @Autowired
+    private McpWebSocketHandler mcpWebSocketHandler;
+    @Autowired
     private AgentWebSocketHandshakeInterceptor agentWebSocketHandshakeInterceptor;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        // 普通聊天
         registry.addHandler(chatWebSocketHandler, "/chat/{token}")
-                .setAllowedOrigins("*"); // 允许所有来源访问，生产环境应该限制
+                .setAllowedOrigins("*");
 
-        // 新增：多Agent协作聊天（添加拦截器提取URL参数）
+        // 多 Agent 协作聊天（LangGraph）
         registry.addHandler(multiAgentWebSocketHandler, "/ws/agent-chat")
+                .addInterceptors(agentWebSocketHandshakeInterceptor)
+                .setAllowedOrigins("*");
+
+        // MCP 企业级 AI Agent 平台
+        registry.addHandler(mcpWebSocketHandler, "/ws/mcp")
                 .addInterceptors(agentWebSocketHandshakeInterceptor)
                 .setAllowedOrigins("*");
     }

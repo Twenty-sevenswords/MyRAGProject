@@ -107,11 +107,12 @@ const getStateLabel = (state: string) => {
 }
 
 const getEventType = (event: any) => {
-  // 注意：后端事件类型是小写的 start, complete, final, error, fallback
+  // 注意：后端事件类型是小写的 start, complete, stream, final, error, fallback
   const map: Record<string, any> = {
     'start': 'info',
     'complete': 'success',
-    'final': 'default',
+    'stream': 'default',
+    'final': 'success',
     'error': 'error',
     'fallback': 'warning'
   }
