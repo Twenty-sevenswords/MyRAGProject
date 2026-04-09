@@ -429,7 +429,8 @@ public class HybridSearchService {
      * 获取用户的数据库ID用于权限过滤
      */
     private String getUserDbId(String userId) {
-        logger.debug("获取用户数据库ID，用户ID: {}", userId);
+
+        logger.info("获取用户数据库ID（返回username以保持一致性），用户ID: {}", userId);
         try {
             // 获取用户名
             User user;
@@ -437,16 +438,18 @@ public class HybridSearchService {
                 Long userIdLong = Long.parseLong(userId);
                 logger.debug("解析用户ID为Long: {}", userIdLong);
                 user = userRepository.findById(userIdLong)
-                    .orElseThrow(() -> new CustomException("User not found with ID: " + userId, HttpStatus.NOT_FOUND));
-                logger.debug("通过ID找到用户: {}", user.getUsername());
-                return userIdLong.toString(); // 如果输入已经是数字ID，直接返回
+                        .orElseThrow(() -> new CustomException("User not found with ID: " + userId, HttpStatus.NOT_FOUND));
+                logger.debug("通过ID找到用户: username={}, id={}", user.getUsername(), user.getId());
+                // 返回username以保持与文档上传时的一致性
+                return user.getUsername();
             } catch (NumberFormatException e) {
                 // 如果userId不是数字格式，则假设它就是username
                 logger.debug("用户ID不是数字格式，作为用户名查找: {}", userId);
                 user = userRepository.findByUsername(userId)
-                    .orElseThrow(() -> new CustomException("User not found: " + userId, HttpStatus.NOT_FOUND));
-                logger.debug("通过用户名找到用户: {}, ID: {}", user.getUsername(), user.getId());
-                return user.getId().toString(); // 返回用户的数据库ID
+                        .orElseThrow(() -> new CustomException("User not found: " + userId, HttpStatus.NOT_FOUND));
+                logger.debug("通过用户名找到用户: username={}, id={}", user.getUsername(), user.getId());
+                // 返回username以保持一致性
+                return user.getUsername();
             }
         } catch (Exception e) {
             logger.error("获取用户数据库ID失败: {}", e.getMessage(), e);

@@ -44,7 +44,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
       agentWs.close();
     }
     // 修正：连接到 /ws/mcp 而不是 /ws/agent-chat
-    const wsUrl = `ws://localhost:8081/ws/mcp?sessionId=${sessionId}&userId=${store.userInfo?.id || 'anonymous'}`;
+    const wsUrl = `ws://localhost:8081/ws/mcp?sessionId=${sessionId}&userId=${store.userInfo?.username || 'anonymous'}`;
     console.log('正在连接 Agent WebSocket:', wsUrl);
     agentWsStatus.value = 'CONNECTING';
     agentWs = new WebSocket(wsUrl);

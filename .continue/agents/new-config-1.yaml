@@ -1,0 +1,21 @@
+name: Continue Config
+version: 1.0.0
+schema: v1
+
+models:
+  - title: SiliconFlow GLM-5 Pro
+    provider: openai
+    model: Pro/zai-org/GLM-5
+    apiKey: sk-hecghnbhbnqdtbakljmlwticvpfmyswnepboqqvtzybpdquo
+    apiBase: https://api.siliconflow.cn/v1
+    contextLength: 198000
+
+tabAutocompleteModel:
+  title: SiliconFlow Qwen2.5-Coder
+  provider: openai
+  model: Qwen/Qwen2.5-Coder-7B-Instruct
+  apiKey: sk-hecghnbhbnqdtbakljmlwticvpfmyswnepboqqvtzybpdquo
+  apiBase: https://api.siliconflow.cn/v1
+  maxTokens: 1024
+
+allowAnonymousTelemetry: false

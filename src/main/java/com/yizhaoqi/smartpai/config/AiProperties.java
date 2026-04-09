@@ -32,11 +32,11 @@ public class AiProperties {
     @Data
     public static class Generation {
         /** 采样温度 */
-        private Double temperature = 0.3;
+        private Double temperature ;
         /** 最大输出 tokens */
-        private Integer maxTokens = 2000;
+        private Integer maxTokens ;
         /** nucleus top-p */
-        private Double topP = 0.9;
+        private Double topP ;
     }
 
     /**
@@ -72,11 +72,11 @@ public class AiProperties {
         /** 来源标注符号（在 application.yml 中配置） */
         private String sourceMarker;
         /** 最小回复长度（在 application.yml 中配置） */
-        private int minReplyLength = 10;
+        private int minReplyLength ;
         /** 最大回复长度，用于降级检查（在 application.yml 中配置） */
-        private int maxReplyLength = 2000;
+        private int maxReplyLength ;
         /** 合格分数阈值（在 application.yml 中配置） */
-        private int passScoreThreshold = 6;
+        private int passScoreThreshold ;
     }
 
 }

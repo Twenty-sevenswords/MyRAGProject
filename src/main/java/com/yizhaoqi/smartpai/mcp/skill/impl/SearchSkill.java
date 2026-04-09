@@ -70,8 +70,11 @@ public class SearchSkill implements Skill {
     @Override
     public boolean shouldInvoke(McpContext context) {
         // 当 RAG 无结果或需要联网搜索时触发
-        return context.isNeedWebSearch() || 
-               Boolean.TRUE.equals(context.getSkillResult("rag_failed"));
+        Boolean ragFailed = context.getSkillResult("rag_failed");
+        return context.isNeedWebSearch() ||
+                Boolean.TRUE.equals(ragFailed) ||
+                (context.getFinalReply() == null || context.getFinalReply().trim().isEmpty());
+
     }
 
     @Override

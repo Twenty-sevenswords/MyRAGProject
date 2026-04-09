@@ -7,19 +7,25 @@ import com.yizhaoqi.smartpai.entity.QaMemoryEntry;
 import com.yizhaoqi.smartpai.repository.RedisRepository;
 import com.yizhaoqi.smartpai.service.QaMemoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 @Component
 public class AgentOrchestrator {
 
+    private static final int DEFAULT_TIMEOUT_SECONDS = 60;
+    
     private final IntentAgent intentAgent;
     private final WorkAgent workAgent;
     private final CheckAgent checkAgent;
@@ -29,6 +35,10 @@ public class AgentOrchestrator {
 
     @Autowired
     private QaMemoryService qaMemoryService;
+    
+    @Autowired
+    @Qualifier("mcpTaskExecutor")
+    private ThreadPoolTaskExecutor taskExecutor;
 
     // 新增：构造函数注入
     public AgentOrchestrator(IntentAgent intentAgent,
@@ -53,10 +63,17 @@ public class AgentOrchestrator {
         SessionState state = new SessionState(sessionId, userId, message);
         activeSessions.put(sessionId, state);
 
-        // 异步执行
-        new Thread(() -> runPipeline(message, sessionId, userId, sink, state)).start();
+        // 使用线程池异步执行（替代 new Thread）
+        taskExecutor.execute(() -> runPipeline(message, sessionId, userId, sink, state));
 
-        return sink.asFlux();
+        return sink.asFlux()
+                .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
+                .onErrorResume(TimeoutException.class, e -> {
+                    logger.error("[Orchestrator] 处理超时，会话ID: {}", sessionId);
+                    emit(sink, AgentEvent.error("处理超时，请稍后重试", sessionId));
+                    sink.tryEmitComplete();
+                    return Flux.empty();
+                });
     }
 
     private void runPipeline(String message, String sessionId, String userId,

@@ -125,6 +125,49 @@ public class QaMemoryService {
     }
 
     /**
+     * 保存问答记忆（简化版本，用于普通问答模式）
+     * @param question 用户问题
+     * @param userId 用户ID
+     * @param answer 回答内容
+     * @param sources 来源列表（可为null）
+     * @param usedLLM 是否使用了LLM
+     */
+    public void saveSimpleMemory(String question, String userId, String answer, List<?> sources, boolean usedLLM) {
+        if (!properties.isEnabled()) {
+            return;
+        }
+
+        // 检查记忆数量限制
+        long count = redisRepository.getQaMemoryCount(userId, properties.getKeyPrefix());
+        if (count >= properties.getMaxMemoryPerUser()) {
+            logger.info("[QaMemory] 用户记忆已达上限 {}, 执行清理", properties.getMaxMemoryPerUser());
+            redisRepository.cleanExpiredQaMemories(userId, properties.getKeyPrefix());
+            
+            count = redisRepository.getQaMemoryCount(userId, properties.getKeyPrefix());
+            if (count >= properties.getMaxMemoryPerUser()) {
+                logger.warn("[QaMemory] 记忆数量已达上限，跳过保存");
+                return;
+            }
+        }
+
+        String questionHash = hashQuestion(question);
+        QaMemoryEntry entry = QaMemoryEntry.create(
+                userId,
+                question,
+                questionHash,
+                null,  // 普通问答模式没有关键词提取
+                answer,
+                sources,
+                usedLLM,
+                properties.getExpireDays()
+        );
+
+        redisRepository.saveQaMemory(entry, properties.getKeyPrefix(), properties.getExpireDays());
+        logger.info("[QaMemory] 简化问答记忆已保存, id={}, userId={}, expireDays={}",
+                entry.getId(), userId, properties.getExpireDays());
+    }
+
+    /**
      * 计算问题相似度
      */
     private double calculateSimilarity(String question, QaMemoryEntry entry, AgentIntent currentIntent) {
@@ -134,12 +177,25 @@ public class QaMemoryService {
         // 2. 关键词相似度
         double keywordSimilarity = calculateKeywordSimilarity(currentIntent, entry);
 
-        // 3. 综合相似度（文本60% + 关键词40%）
-        double totalSimilarity = textSimilarity * 0.6 + keywordSimilarity * 0.4;
+        // 3. 综合相似度
+        // 当有关键词信息时：文本60% + 关键词40%
+        // 当没有关键词信息时：完全依赖文本相似度
+        double totalSimilarity;
+        boolean hasKeywordInfo = currentIntent != null && currentIntent.getKeywords() != null &&
+                                  !currentIntent.getKeywords().isEmpty() &&
+                                  entry.getKeywords() != null && !entry.getKeywords().isEmpty();
+        
+        if (hasKeywordInfo) {
+            totalSimilarity = textSimilarity * 0.6 + keywordSimilarity * 0.4;
+        } else {
+            // 没有关键词信息时，完全依赖文本相似度
+            totalSimilarity = textSimilarity;
+        }
 
-        logger.debug("[QaMemory] 相似度计算: textSim={}, keywordSim={}, total={}",
+        logger.debug("[QaMemory] 相似度计算: textSim={}, keywordSim={}, hasKeywordInfo={}, total={}",
                 String.format("%.2f", textSimilarity),
                 String.format("%.2f", keywordSimilarity),
+                hasKeywordInfo,
                 String.format("%.2f", totalSimilarity));
 
         return totalSimilarity;
