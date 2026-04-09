@@ -1,8 +1,8 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class SearchSkill implements Skill {
     private static final Logger logger = LoggerFactory.getLogger(SearchSkill.class);
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Value("${ai.web-search.enabled:true}")
     private boolean webSearchEnabled;
@@ -196,6 +196,6 @@ public class SearchSkill implements Skill {
             context.toString(), query
         );
 
-        return deepSeekClient.chat(prompt, "你是一个有帮助的助手，擅长从搜索结果中提取有用信息。");
+        return chatService.chat("你是一个有帮助的助手，擅长从搜索结果中提取有用信息。", prompt);
     }
 }

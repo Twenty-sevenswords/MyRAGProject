@@ -1,9 +1,9 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class CheckSkill implements Skill {
     private static final Logger logger = LoggerFactory.getLogger(CheckSkill.class);
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Value("${ai.agent.check.source-marker:【}")
     private String sourceMarker;
@@ -167,7 +167,7 @@ public class CheckSkill implements Skill {
         );
 
         try {
-            String response = deepSeekClient.chat(checkPrompt, "你是一个严格的质量检查员。");
+            String response = chatService.chat("你是一个严格的质量检查员。", checkPrompt);
             
             // 解析 JSON
             Map<String, Object> result = parseCheckResult(response);

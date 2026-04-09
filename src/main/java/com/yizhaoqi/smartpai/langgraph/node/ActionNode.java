@@ -1,6 +1,5 @@
 package com.yizhaoqi.smartpai.langgraph.node;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.config.AiProperties;
 import com.yizhaoqi.smartpai.entity.AgentIntent;
 import com.yizhaoqi.smartpai.entity.AgentResult;
@@ -8,6 +7,7 @@ import com.yizhaoqi.smartpai.entity.SearchResult;
 import com.yizhaoqi.smartpai.langgraph.event.GraphEvent;
 import com.yizhaoqi.smartpai.langgraph.state.AIState;
 import com.yizhaoqi.smartpai.service.HybridSearchService;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class ActionNode implements StreamingNodeAction {
     private HybridSearchService hybridSearchService;
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Autowired
     private AiProperties aiProperties;
@@ -160,7 +160,7 @@ public class ActionNode implements StreamingNodeAction {
                 .replace("{message}", message);
 
         logger.info("[ActionNode] 正在调用 LLM 生成回复...");
-        String reply = deepSeekClient.chat(prompt);
+        String reply = chatService.chat(prompt);
         logger.info("[ActionNode] LLM 生成完成，回复长度: {} 字符", reply != null ? reply.length() : 0);
 
         // 更新状态

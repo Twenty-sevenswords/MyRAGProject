@@ -1,15 +1,13 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.entity.SearchResult;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
 import com.yizhaoqi.smartpai.service.HybridSearchService;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.convert.MapConverter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -18,18 +16,15 @@ import java.util.stream.Collectors;
 
 /**
  * RAG 检索技能
- * 本地知识库检索 + LLM 生成
+ * 本地知识库检索 + LLM 生成（使用 LangChain4j）
  */
 @Component
 public class RagSkill implements Skill {
 
     private static final Logger logger = LoggerFactory.getLogger(RagSkill.class);
 
-    @Autowired
-    private HybridSearchService searchService;
-
-    @Autowired
-    private DeepSeekClient deepSeekClient;
+    private final HybridSearchService searchService;
+    private final LangChain4jChatService chatService;
 
     @Value("${ai.prompt.rules:}")
     private String systemPrompt;
@@ -39,6 +34,11 @@ public class RagSkill implements Skill {
 
     @Value("${ai.generation.max-tokens:2000}")
     private int maxTokens;
+
+    public RagSkill(HybridSearchService searchService, LangChain4jChatService chatService) {
+        this.searchService = searchService;
+        this.chatService = chatService;
+    }
 
     @Override
     public String getName() {
@@ -89,9 +89,9 @@ public class RagSkill implements Skill {
         String userId = context.getUserId();
         //获取历史消息用于上下文
         @SuppressWarnings("unchecked")
-        List<McpContext.ChatMessage> history =params.get("history");
+        List<McpContext.ChatMessage> history = params.get("history");
         try {
-            logger.info("[RagSkill] 执行检索，查询语句: query={},userId={},historySize={}", query,userId,history!=null?history.size():0);
+            logger.info("[RagSkill] 执行检索，查询语句: query={},userId={},historySize={}", query, userId, history != null ? history.size() : 0);
 
             // 1. 执行检索
             List<SearchResult> results = searchService.searchWithPermission(query, userId, topK);
@@ -99,7 +99,7 @@ public class RagSkill implements Skill {
 
             if (results.isEmpty()) {
                 //设置失败标记，以便触发web_search fallback
-                context.putSkillResult("rag_failed",true);
+                context.putSkillResult("rag_failed", true);
                 return SkillResult.failure("NO_RESULTS", "未找到相关文档");
             }
 
@@ -121,7 +121,7 @@ public class RagSkill implements Skill {
         } catch (Exception e) {
             logger.error("[RagSkill] 执行失败", e);
             //设置失败标记，以便触发web_search fallback
-            context.putSkillResult("rag_failed",true);
+            context.putSkillResult("rag_failed", true);
             return SkillResult.failure("EXECUTION_ERROR", e.getMessage());
         }
     }
@@ -149,7 +149,7 @@ public class RagSkill implements Skill {
 
                 if (results.isEmpty()) {
                     //设置失败标记，以便触发web_search fallback
-                    context.putSkillResult("rag_failed",true);
+                    context.putSkillResult("rag_failed", true);
                     emitter.next(SkillEvent.error(getName(), "未找到相关文档"));
                     emitter.complete();
                     return;
@@ -161,20 +161,20 @@ public class RagSkill implements Skill {
                 // 3. 流式生成回答
                 emitter.next(SkillEvent.progress(getName(), "生成回答..."));
 
-
                 String prompt = buildPromptWithHistory(query, contextText, history);
                 logger.debug("[RagSkill] 构建的prompt长度: {}", prompt.length());
-                //使用流式代替异步流式调用
-                String fullReply = deepSeekClient.chat(prompt,systemPrompt);
+                
+                // 使用 LangChain4j 进行同步调用
+                String fullReply = chatService.chat(systemPrompt, prompt);
 
-                //发送完整的回答啊作为流式事件
-                if(fullReply!=null&&!fullReply.isEmpty()){
+                //发送完整的回答作为流式事件
+                if (fullReply != null && !fullReply.isEmpty()) {
                     emitter.next(SkillEvent.chunk(getName(), fullReply));
                 }
 
                 // 4. 构建返回结果
                 Map<String, Object> data = new LinkedHashMap<>();
-                data.put("reply", fullReply!=null?fullReply:"");
+                data.put("reply", fullReply != null ? fullReply : "");
                 data.put("sources", buildSources(results));
                 data.put("usedLLM", true);
 
@@ -186,7 +186,7 @@ public class RagSkill implements Skill {
             } catch (Exception e) {
                 logger.error("[RagSkill] 流式执行失败", e);
                 //设置失败标记
-                context.putSkillResult("rag_failed",true);
+                context.putSkillResult("rag_failed", true);
                 emitter.next(SkillEvent.error(getName(), e.getMessage()));
                 emitter.complete();
             }
@@ -240,7 +240,7 @@ public class RagSkill implements Skill {
 
     private String generateReply(String query, String context, List<McpContext.ChatMessage> history) {
         String prompt = buildPromptWithHistory(query, context, history);
-        return deepSeekClient.chat(prompt, systemPrompt);
+        return chatService.chat(systemPrompt, prompt);
     }
 
     private List<Map<String, Object>> buildSources(List<SearchResult> results) {

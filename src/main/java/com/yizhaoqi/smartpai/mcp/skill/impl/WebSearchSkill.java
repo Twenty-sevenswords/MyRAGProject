@@ -51,12 +51,10 @@ public class WebSearchSkill implements Skill {
 
     @Override
     public SkillParameterSchema getParameterSchema() {
-        return SkillParameterSchema.builder()
-                .type("object")
-                .description("网络搜索参数")
-                .addProperty("query", "string", "搜索关键词", true)
-                .addProperty("limit", "integer", "返回结果数量", false)
-                .build();
+        return SkillParameterSchema.create()
+                .property("query", SkillParameterSchema.PropertySchema.string("搜索关键词").required(true))
+                .property("limit", SkillParameterSchema.PropertySchema.integer("返回结果数量").defaultValue(5))
+                .required("query");
     }
 
     @Override
@@ -83,7 +81,12 @@ public class WebSearchSkill implements Skill {
             source.put("timestamp", System.currentTimeMillis());
             sources.add(source);
 
-            return SkillResult.success(searchResult, sources);
+            // 构建返回数据（包含回复和来源）
+            Map<String, Object> resultData = new HashMap<>();
+            resultData.put("reply", searchResult);
+            resultData.put("sources", sources);
+            
+            return SkillResult.success(resultData, "网络搜索完成");
             
         } catch (Exception e) {
             logger.error("[WebSearchTool] 搜索失败", e);

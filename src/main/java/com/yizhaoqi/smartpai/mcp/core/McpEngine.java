@@ -327,11 +327,15 @@ public class McpEngine {
             SkillResult result = targetSkill.execute(context, skillParams);
             
             if (result.isSuccess()) {
-                context.setFinalReply(result.getOutput());
+                // 从 data 中提取回复和来源
+                @SuppressWarnings("unchecked")
+                Map<String, Object> resultData = (Map<String, Object>) result.getData();
+                String reply = resultData != null ? (String) resultData.get("reply") : null;
+                context.setFinalReply(reply != null ? reply : result.getMessage());
                 context.putSkillResult("routed", true);
                 context.putSkillResult("toolName", toolName);
-                if (result.getSources() != null) {
-                    context.putSkillResult("sources", result.getSources());
+                if (resultData != null && resultData.containsKey("sources")) {
+                    context.putSkillResult("sources", resultData.get("sources"));
                 }
                 emit(sink, McpEvent.complete(toolName, "工具调用成功", context.getSessionId()));
             } else {

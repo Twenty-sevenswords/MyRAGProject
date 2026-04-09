@@ -1,33 +1,37 @@
 package com.yizhaoqi.smartpai.service;
 
-import com.yizhaoqi.smartpai.client.EmbeddingClient;
 import com.yizhaoqi.smartpai.model.DocumentVector;
 import com.yizhaoqi.smartpai.entity.EsDocument;
 import com.yizhaoqi.smartpai.entity.TextChunk;
 import com.yizhaoqi.smartpai.repository.DocumentVectorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-// 向量化服务类
+/**
+ * 向量化服务类
+ * 使用 LangChain4j 进行文本向量化
+ */
 @Service
 public class VectorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(VectorizationService.class);
 
-    @Autowired
-    private EmbeddingClient embeddingClient;
+    private final LangChain4jEmbeddingService embeddingService;
+    private final ElasticsearchService elasticsearchService;
+    private final DocumentVectorRepository documentVectorRepository;
 
-    @Autowired
-    private ElasticsearchService elasticsearchService;
-
-    @Autowired
-    private DocumentVectorRepository documentVectorRepository;
+    public VectorizationService(LangChain4jEmbeddingService embeddingService,
+                                ElasticsearchService elasticsearchService,
+                                DocumentVectorRepository documentVectorRepository) {
+        this.embeddingService = embeddingService;
+        this.elasticsearchService = elasticsearchService;
+        this.documentVectorRepository = documentVectorRepository;
+    }
 
     /**
      * 执行向量化操作
@@ -53,8 +57,8 @@ public class VectorizationService {
                     .map(TextChunk::getContent)
                     .toList();
 
-            // 调用外部模型生成向量
-            List<float[]> vectors = embeddingClient.embed(texts);
+            // 调用 LangChain4j 生成向量
+            List<float[]> vectors = embeddingService.embedBatch(texts);
 
             // 构建 Elasticsearch 文档并存储
             List<EsDocument> esDocuments = IntStream.range(0, chunks.size())
@@ -64,7 +68,7 @@ public class VectorizationService {
                             chunks.get(i).getChunkId(),
                             chunks.get(i).getContent(),
                             vectors.get(i),
-                            "deepseek-embed", // 更新为 DeepSeek 的模型版本
+                            "langchain4j-embed", // 更新为 LangChain4j 模型版本
                             userId,
                             orgTag,
                             isPublic

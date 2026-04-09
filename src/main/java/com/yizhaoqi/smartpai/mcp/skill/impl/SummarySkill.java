@@ -1,8 +1,8 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class SummarySkill implements Skill {
     private static final Logger logger = LoggerFactory.getLogger(SummarySkill.class);
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Override
     public String getName() {
@@ -119,6 +119,6 @@ public class SummarySkill implements Skill {
             stylePrompt, text.substring(0, Math.min(text.length(), 10000)), maxLength
         );
 
-        return deepSeekClient.chat(prompt, "你是一个专业的文本摘要助手，擅长提取关键信息。");
+        return chatService.chat("你是一个专业的文本摘要助手，擅长提取关键信息。", prompt);
     }
 }

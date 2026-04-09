@@ -1,32 +1,38 @@
 package com.yizhaoqi.smartpai.service.agent;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.config.AiProperties;
 import com.yizhaoqi.smartpai.entity.AgentIntent;
 import com.yizhaoqi.smartpai.entity.AgentResult;
 import com.yizhaoqi.smartpai.entity.SearchResult;
 import com.yizhaoqi.smartpai.service.HybridSearchService;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 工作 Agent
+ * 使用 LangChain4j 执行 RAG 流程
+ */
 @Component
 public class WorkAgent {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkAgent.class);
 
-    @Autowired
-    private HybridSearchService hybridSearchService;
+    private final HybridSearchService hybridSearchService;
+    private final LangChain4jChatService chatService;
+    private final AiProperties aiProperties;
 
-    @Autowired
-    private DeepSeekClient deepSeekClient;
-
-    @Autowired
-    private AiProperties aiProperties;
+    public WorkAgent(HybridSearchService hybridSearchService,
+                     LangChain4jChatService chatService,
+                     AiProperties aiProperties) {
+        this.hybridSearchService = hybridSearchService;
+        this.chatService = chatService;
+        this.aiProperties = aiProperties;
+    }
 
     public AgentResult execute(AgentIntent intent, String message, String userId) {
         logger.info("[WorkAgent] ========== 开始执行任务 ==========");
@@ -121,8 +127,8 @@ public class WorkAgent {
                 .replace("{context}", context)
                 .replace("{message}", message);
 
-        logger.info("[WorkAgent] 正在调用 LLM 生成回复...");
-        String reply = deepSeekClient.chat(prompt);
+        logger.info("[WorkAgent] 正在调用 LangChain4j 生成回复...");
+        String reply = chatService.chat(prompt);
         logger.info("[WorkAgent] LLM 生成完成，回复长度: {} 字符", reply != null ? reply.length() : 0);
 
         logger.info("[WorkAgent] RAG流程完成，使用LLM: true, cost: 1");

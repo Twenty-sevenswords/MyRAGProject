@@ -1,11 +1,11 @@
 package com.yizhaoqi.smartpai.langgraph.node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.config.AiProperties;
 import com.yizhaoqi.smartpai.entity.AgentIntent;
 import com.yizhaoqi.smartpai.langgraph.event.GraphEvent;
 import com.yizhaoqi.smartpai.langgraph.state.AIState;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class RouterNode implements StreamingNodeAction {
     private static final Logger logger = LoggerFactory.getLogger(RouterNode.class);
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -54,7 +54,7 @@ public class RouterNode implements StreamingNodeAction {
 
             // 调用LLM分析意图
             logger.info("[RouterNode] 正在调用 LLM 分析意图...");
-            String response = deepSeekClient.chat(prompt);
+            String response = chatService.chat(prompt);
             logger.info("[RouterNode] LLM 原始响应: {}", response);
 
             // 解析意图

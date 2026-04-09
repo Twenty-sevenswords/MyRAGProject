@@ -1,13 +1,12 @@
 package com.yizhaoqi.smartpai.service.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.config.AiProperties;
 import com.yizhaoqi.smartpai.entity.AgentIntent;
 import com.yizhaoqi.smartpai.entity.AgentResult;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,19 +14,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 检查 Agent
+ * 使用 LangChain4j 进行质量检查
+ */
 @Component
 public class CheckAgent {
 
     private static final Logger logger = LoggerFactory.getLogger(CheckAgent.class);
 
-    @Autowired
-    private DeepSeekClient deepSeekClient;
+    private final LangChain4jChatService chatService;
+    private final ObjectMapper objectMapper;
+    private final AiProperties aiProperties;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private AiProperties aiProperties;
+    public CheckAgent(LangChain4jChatService chatService,
+                      ObjectMapper objectMapper,
+                      AiProperties aiProperties) {
+        this.chatService = chatService;
+        this.objectMapper = objectMapper;
+        this.aiProperties = aiProperties;
+    }
 
     // 快速规则检查（零成本）
     public boolean quickCheck(AgentResult result, AgentIntent intent) {
@@ -91,8 +97,8 @@ public class CheckAgent {
             String checkPrompt = buildCheckPrompt(result, originalMessage);
             logger.debug("[CheckAgent] LLM检查Prompt: {}", checkPrompt);
 
-            // 调用 LLM 进行检查
-            String llmResponse = deepSeekClient.chat(checkPrompt);
+            // 调用 LangChain4j 进行检查
+            String llmResponse = chatService.chat(checkPrompt);
             logger.info("[CheckAgent] LLM检查响应: {}", llmResponse);
 
             // 解析 LLM 响应

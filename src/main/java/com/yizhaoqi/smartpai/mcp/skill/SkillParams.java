@@ -21,6 +21,13 @@ public class SkillParams {
         return this;
     }
 
+    public SkillParams putAll(Map<String, Object> map) {
+        if (map != null) {
+            params.putAll(map);
+        }
+        return this;
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
         return (T) params.get(key);

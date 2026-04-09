@@ -1,8 +1,8 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
-import com.yizhaoqi.smartpai.client.DeepSeekClient;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
+import com.yizhaoqi.smartpai.service.LangChain4jChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class QaSkill implements Skill {
     private static final Logger logger = LoggerFactory.getLogger(QaSkill.class);
 
     @Autowired
-    private DeepSeekClient deepSeekClient;
+    private LangChain4jChatService chatService;
 
     @Override
     public String getName() {
@@ -77,7 +77,7 @@ public class QaSkill implements Skill {
             String prompt = buildPrompt(question, contextInfo, historyText);
 
             // 调用 LLM
-            String answer = deepSeekClient.chat(prompt, "你是派聪明知识助手，请用简体中文回答问题。");
+            String answer = chatService.chat("你是派聪明知识助手，请用简体中文回答问题。", prompt);
 
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("reply", answer);
@@ -104,8 +104,8 @@ public class QaSkill implements Skill {
 
                 String prompt = buildPrompt(question, contextInfo, historyText);
 
-                // 使用同步调用（因为 streamResponse 是异步的，不适合这里的 Flux 模式）
-                String answer = deepSeekClient.chat(prompt, "你是派聪明知识助手，请用简体中文回答问题。");
+                // 使用同步调用
+                String answer = chatService.chat("你是派聪明知识助手，请用简体中文回答问题。", prompt);
                 
                 // 模拟流式输出
                 for (int i = 0; i < answer.length(); i += 10) {
