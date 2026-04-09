@@ -1,11 +1,14 @@
 package com.yizhaoqi.smartpai.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.agent.tool.ToolSpecifications;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -15,10 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * LangChain4j Agent 服务
@@ -32,6 +36,8 @@ public class LangChain4jAgentService {
     private final ChatLanguageModel chatModel;
     private final ObjectMapper objectMapper;
     private final List<Object> tools = new ArrayList<>();
+    private final Map<String, Method> toolMethodMap = new ConcurrentHashMap<>();
+    private final Map<String, Object> toolInstanceMap = new ConcurrentHashMap<>();
 
     public LangChain4jAgentService(ChatLanguageModel chatModel, ObjectMapper objectMapper) {
         this.chatModel = chatModel;
@@ -44,6 +50,17 @@ public class LangChain4jAgentService {
     public void registerTool(Object tool) {
         tools.add(tool);
         logger.info("[LangChain4j Agent] 注册工具: {}", tool.getClass().getSimpleName());
+        
+        // 扫描并缓存工具方法
+        for (Method method : tool.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Tool.class)) {
+                Tool toolAnnotation = method.getAnnotation(Tool.class);
+                String toolName = toolAnnotation.name().isEmpty() ? method.getName() : toolAnnotation.name();
+                toolMethodMap.put(toolName, method);
+                toolInstanceMap.put(toolName, tool);
+                logger.info("[LangChain4j Agent] 注册工具方法: {} -> {}", toolName, method.getName());
+            }
+        }
     }
 
     /**
@@ -92,12 +109,8 @@ public class LangChain4jAgentService {
                 logger.info("[LangChain4j Agent] 需要执行工具: {} 个", 
                         aiMessage.toolExecutionRequests().size());
                 
-                // TODO: 执行工具调用
-                // 这里需要实现工具执行逻辑
-                return AgentResult.toolCallRequired(
-                        aiMessage.text(),
-                        aiMessage.toolExecutionRequests()
-                );
+                // 执行工具调用
+                return executeToolsAndContinue(aiMessage, chatMemory, toolSpecs);
             }
             
             // 添加 AI 响应到记忆
@@ -109,6 +122,149 @@ public class LangChain4jAgentService {
             logger.error("[LangChain4j Agent] 执行失败", e);
             return AgentResult.failure(e.getMessage());
         }
+    }
+
+    /**
+     * 执行工具调用并继续对话
+     */
+    private AgentResult executeToolsAndContinue(AiMessage aiMessage, ChatMemory chatMemory, 
+                                                  List<ToolSpecification> toolSpecs) {
+        try {
+            // 添加 AI 消息到记忆
+            chatMemory.add(aiMessage);
+            
+            // 执行所有工具调用
+            for (ToolExecutionRequest toolRequest : aiMessage.toolExecutionRequests()) {
+                logger.info("[LangChain4j Agent] 执行工具: name={}, id={}", 
+                        toolRequest.name(), toolRequest.id());
+                
+                String toolResult = executeToolCall(toolRequest);
+                logger.info("[LangChain4j Agent] 工具执行结果: {}", 
+                        toolResult.length() > 200 ? toolResult.substring(0, 200) + "..." : toolResult);
+                
+                // 添加工具执行结果到记忆
+                chatMemory.add(ToolExecutionResultMessage.from(toolRequest, toolResult));
+            }
+            
+            // 继续生成响应
+            Response<AiMessage> continueResponse = chatModel.generate(chatMemory.messages(), toolSpecs);
+            AiMessage continueMessage = continueResponse.content();
+            
+            // 检查是否还需要执行工具（递归处理）
+            if (continueMessage.hasToolExecutionRequests()) {
+                logger.info("[LangChain4j Agent] 继续执行工具: {} 个", 
+                        continueMessage.toolExecutionRequests().size());
+                return executeToolsAndContinue(continueMessage, chatMemory, toolSpecs);
+            }
+            
+            // 添加最终响应到记忆
+            chatMemory.add(continueMessage);
+            
+            return AgentResult.success(continueMessage.text());
+            
+        } catch (Exception e) {
+            logger.error("[LangChain4j Agent] 工具执行失败", e);
+            return AgentResult.failure("工具执行失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 执行单个工具调用
+     */
+    private String executeToolCall(ToolExecutionRequest toolRequest) {
+        String toolName = toolRequest.name();
+        String argumentsJson = toolRequest.arguments();
+        
+        try {
+            Method method = toolMethodMap.get(toolName);
+            Object toolInstance = toolInstanceMap.get(toolName);
+            
+            if (method == null || toolInstance == null) {
+                logger.warn("[LangChain4j Agent] 未找到工具: {}", toolName);
+                return "{\"error\": \"Tool not found: " + toolName + "\"}";
+            }
+            
+            // 解析参数
+            Map<String, Object> arguments = objectMapper.readValue(argumentsJson, 
+                    new TypeReference<Map<String, Object>>() {});
+            
+            // 准备方法参数
+            Class<?>[] paramTypes = method.getParameterTypes();
+            Object[] args = new Object[paramTypes.length];
+            
+            for (int i = 0; i < paramTypes.length; i++) {
+                String paramName = method.getParameters()[i].getName();
+                Object value = arguments.get(paramName);
+                
+                if (value != null) {
+                    args[i] = convertArgument(value, paramTypes[i]);
+                } else {
+                    args[i] = getDefaultValue(paramTypes[i]);
+                }
+            }
+            
+            // 执行方法
+            method.setAccessible(true);
+            Object result = method.invoke(toolInstance, args);
+            
+            // 转换结果为字符串
+            if (result == null) {
+                return "null";
+            } else if (result instanceof String) {
+                return (String) result;
+            } else {
+                return objectMapper.writeValueAsString(result);
+            }
+            
+        } catch (Exception e) {
+            logger.error("[LangChain4j Agent] 工具调用异常: tool={}, error={}", 
+                    toolName, e.getMessage(), e);
+            return "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+        }
+    }
+
+    /**
+     * 转换参数类型
+     */
+    private Object convertArgument(Object value, Class<?> targetType) {
+        if (value == null) {
+            return null;
+        }
+        
+        if (targetType.isAssignableFrom(value.getClass())) {
+            return value;
+        }
+        
+        // 处理基本类型转换
+        if (targetType == String.class) {
+            return value.toString();
+        } else if (targetType == Integer.class || targetType == int.class) {
+            return Integer.valueOf(value.toString());
+        } else if (targetType == Long.class || targetType == long.class) {
+            return Long.valueOf(value.toString());
+        } else if (targetType == Double.class || targetType == double.class) {
+            return Double.valueOf(value.toString());
+        } else if (targetType == Boolean.class || targetType == boolean.class) {
+            return Boolean.valueOf(value.toString());
+        }
+        
+        // 复杂类型使用 Jackson 转换
+        return objectMapper.convertValue(value, targetType);
+    }
+
+    /**
+     * 获取参数默认值
+     */
+    private Object getDefaultValue(Class<?> type) {
+        if (type == boolean.class) return false;
+        if (type == int.class) return 0;
+        if (type == long.class) return 0L;
+        if (type == double.class) return 0.0;
+        if (type == float.class) return 0.0f;
+        if (type == char.class) return '\0';
+        if (type == byte.class) return (byte) 0;
+        if (type == short.class) return (short) 0;
+        return null;
     }
 
     /**
@@ -276,8 +432,7 @@ public class LangChain4jAgentService {
         messages.add(SystemMessage.from(systemPrompt));
         messages.add(UserMessage.from(userPrompt));
         
-        dev.langchain4j.model.output.Response<dev.langchain4j.data.message.AiMessage> response =
-                chatModel.generate(messages);
+        Response<AiMessage> response = chatModel.generate(messages);
         String responseText = response.content().text();
         
         CheckResult result = new CheckResult();

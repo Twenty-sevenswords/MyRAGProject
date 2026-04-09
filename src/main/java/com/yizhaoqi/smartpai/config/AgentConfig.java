@@ -14,20 +14,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AgentConfig {
 
-    @Bean
-    public IntentAgent intentAgent() {
-        return new IntentAgent();
-    }
-
-    @Bean
-    public WorkAgent workAgent() {
-        return new WorkAgent();
-    }
-
-    @Bean
-    public CheckAgent checkAgent() {
-        return new CheckAgent();
-    }
+//    @Bean
+//    public IntentAgent intentAgent() {
+//        return new IntentAgent();
+//    }
+//
+//    @Bean
+//    public WorkAgent workAgent() {
+//        return new WorkAgent();
+//    }
+//
+//    @Bean
+//    public CheckAgent checkAgent() {
+//        return new CheckAgent();
+//    }
 
     @Bean
     public AgentOrchestrator agentOrchestrator(

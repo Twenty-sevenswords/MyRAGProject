@@ -4,12 +4,10 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.chat.request.ChatRequest;
-import dev.langchain4j.model.chat.request.ChatRequestParameters;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
+import dev.langchain4j.model.output.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +44,7 @@ public class LangChain4jChatService {
      */
     public String chat(String userMessage) {
         logger.debug("[LangChain4j] 同步调用: {}", userMessage);
-        return chatModel.chat(userMessage);
+        return chatModel.generate(userMessage);
     }
 
     /**
@@ -60,8 +58,8 @@ public class LangChain4jChatService {
         messages.add(SystemMessage.from(systemPrompt));
         messages.add(UserMessage.from(userMessage));
         
-        ChatResponse response = chatModel.chat(messages);
-        return response.aiMessage().text();
+        Response<AiMessage> response = chatModel.generate(messages);
+        return response.content().text();
     }
 
     /**
@@ -94,8 +92,8 @@ public class LangChain4jChatService {
         // 添加当前用户消息
         messages.add(UserMessage.from(userMessage));
         
-        ChatResponse response = chatModel.chat(messages);
-        return response.aiMessage().text();
+        Response<AiMessage> response = chatModel.generate(messages);
+        return response.content().text();
     }
 
     // ========== 流式调用 ==========
@@ -106,17 +104,17 @@ public class LangChain4jChatService {
     public void streamChat(String userMessage, Consumer<String> onChunk, Consumer<Throwable> onError) {
         logger.debug("[LangChain4j] 流式调用: {}", userMessage);
         
-        streamingChatModel.chat(userMessage, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(userMessage, new StreamingResponseHandler<AiMessage>() {
             private final StringBuilder fullResponse = new StringBuilder();
 
             @Override
-            public void onPartialResponse(String partialResponse) {
-                fullResponse.append(partialResponse);
-                onChunk.accept(partialResponse);
+            public void onNext(String token) {
+                fullResponse.append(token);
+                onChunk.accept(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 logger.debug("[LangChain4j] 流式调用完成");
             }
 
@@ -139,17 +137,17 @@ public class LangChain4jChatService {
         messages.add(SystemMessage.from(systemPrompt));
         messages.add(UserMessage.from(userMessage));
         
-        streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
             private final StringBuilder fullResponse = new StringBuilder();
 
             @Override
-            public void onPartialResponse(String partialResponse) {
-                fullResponse.append(partialResponse);
-                onChunk.accept(partialResponse);
+            public void onNext(String token) {
+                fullResponse.append(token);
+                onChunk.accept(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 logger.debug("[LangChain4j] 流式调用完成，总长度: {}", fullResponse.length());
             }
 
@@ -192,17 +190,17 @@ public class LangChain4jChatService {
         // 添加当前用户消息
         messages.add(UserMessage.from(userMessage));
         
-        streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
             private final StringBuilder fullResponse = new StringBuilder();
 
             @Override
-            public void onPartialResponse(String partialResponse) {
-                fullResponse.append(partialResponse);
-                onChunk.accept(partialResponse);
+            public void onNext(String token) {
+                fullResponse.append(token);
+                onChunk.accept(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 logger.debug("[LangChain4j] 流式调用完成，总长度: {}", fullResponse.length());
             }
 
@@ -226,14 +224,14 @@ public class LangChain4jChatService {
         }
         messages.add(UserMessage.from(userMessage));
         
-        streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
             @Override
-            public void onPartialResponse(String partialResponse) {
-                sink.tryEmitNext(partialResponse);
+            public void onNext(String token) {
+                sink.tryEmitNext(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 sink.tryEmitComplete();
             }
 
@@ -276,14 +274,14 @@ public class LangChain4jChatService {
         // 添加当前用户消息
         messages.add(UserMessage.from(userMessage));
         
-        streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
             @Override
-            public void onPartialResponse(String partialResponse) {
-                sink.tryEmitNext(partialResponse);
+            public void onNext(String token) {
+                sink.tryEmitNext(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 sink.tryEmitComplete();
             }
 

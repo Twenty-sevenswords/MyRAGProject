@@ -10,10 +10,9 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
@@ -27,7 +26,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -79,12 +77,11 @@ public class LangChain4jRagService {
                 documentId, fileName, content.length());
         
         // 创建元数据
-        Map<String, Object> metadataMap = new HashMap<>();
-        metadataMap.put("documentId", documentId);
-        metadataMap.put("fileName", fileName);
-        metadataMap.put("userId", userId);
-        metadataMap.put("tags", tags != null ? String.join(",", tags) : "");
-        Metadata metadata = Metadata.from(metadataMap);
+        Metadata metadata = new Metadata();
+        metadata.put("documentId", documentId);
+        metadata.put("fileName", fileName);
+        metadata.put("userId", userId);
+        metadata.put("tags", tags != null ? String.join(",", tags) : "");
         
         // 创建文档
         Document document = Document.from(content, metadata);
@@ -109,12 +106,11 @@ public class LangChain4jRagService {
         List<TextSegment> allSegments = new ArrayList<>();
         
         for (DocumentContent doc : documents) {
-            Map<String, Object> metadataMap = new HashMap<>();
-            metadataMap.put("documentId", doc.getDocumentId());
-            metadataMap.put("fileName", doc.getFileName());
-            metadataMap.put("userId", doc.getUserId());
-            metadataMap.put("tags", doc.getTags() != null ? String.join(",", doc.getTags()) : "");
-            Metadata metadata = Metadata.from(metadataMap);
+            Metadata metadata = new Metadata();
+            metadata.put("documentId", doc.getDocumentId());
+            metadata.put("fileName", doc.getFileName());
+            metadata.put("userId", doc.getUserId());
+            metadata.put("tags", doc.getTags() != null ? String.join(",", doc.getTags()) : "");
             
             Document document = Document.from(doc.getContent(), metadata);
             DocumentSplitter splitter = DocumentSplitters.recursive(500, 50);
@@ -180,8 +176,32 @@ public class LangChain4jRagService {
                     Metadata metadata = match.embedded().metadata();
                     String docUserId = metadata.getString("userId");
                     String tags = metadata.getString("tags");
-                    // TODO: 实现实际的权限过滤逻辑
-                    return true;
+                    
+                    // 权限过滤逻辑：
+                    // 1. 如果文档没有设置 userId（公开文档），允许访问
+                    // 2. 如果用户是文档所有者，允许访问
+                    // 3. 如果文档有标签，检查用户是否有对应权限
+                    if (docUserId == null || docUserId.isEmpty()) {
+                        // 公开文档，允许访问
+                        return true;
+                    }
+                    
+                    if (userId != null && userId.equals(docUserId)) {
+                        // 用户是文档所有者，允许访问
+                        return true;
+                    }
+                    
+                    // 检查标签权限（如果用户有对应标签权限则允许访问）
+                    if (tags != null && !tags.isEmpty() && userId != null) {
+                        // 这里可以扩展为检查用户是否有对应标签的访问权限
+                        // 目前简化处理：有标签的文档允许所有登录用户访问
+                        return true;
+                    }
+                    
+                    // 默认拒绝访问
+                    logger.debug("[LangChain4j RAG] 权限过滤拒绝访问: docUserId={}, requestUserId={}",
+                            docUserId, userId);
+                    return false;
                 })
                 .limit(maxResults)
                 .map(this::toSearchResult)
@@ -218,8 +238,7 @@ public class LangChain4jRagService {
         
         // 3. 生成回答
         String prompt = buildPrompt(context, question);
-        ChatResponse response = chatModel.chat(prompt);
-        return response.aiMessage().text();
+        return chatModel.generate(prompt);
     }
 
     /**
@@ -241,8 +260,8 @@ public class LangChain4jRagService {
         messages.add(SystemMessage.from(systemPrompt != null ? systemPrompt : DEFAULT_SYSTEM_PROMPT));
         messages.add(UserMessage.from(buildPrompt(context, question)));
         
-        ChatResponse response = chatModel.chat(messages);
-        return response.aiMessage().text();
+        Response<AiMessage> response = chatModel.generate(messages);
+        return response.content().text();
     }
 
     /**
@@ -264,14 +283,14 @@ public class LangChain4jRagService {
         // 3. 流式生成回答
         String prompt = buildPrompt(context, question);
         
-        streamingChatModel.chat(prompt, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(prompt, new StreamingResponseHandler<AiMessage>() {
             @Override
-            public void onPartialResponse(String partialResponse) {
-                onChunk.accept(partialResponse);
+            public void onNext(String token) {
+                onChunk.accept(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 logger.debug("[LangChain4j RAG] 流式生成完成");
             }
 
@@ -306,14 +325,14 @@ public class LangChain4jRagService {
         messages.add(SystemMessage.from(DEFAULT_SYSTEM_PROMPT));
         messages.add(UserMessage.from(buildPrompt(context, question)));
         
-        streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
+        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
             @Override
-            public void onPartialResponse(String partialResponse) {
-                sink.tryEmitNext(partialResponse);
+            public void onNext(String token) {
+                sink.tryEmitNext(token);
             }
 
             @Override
-            public void onCompleteResponse(ChatResponse completeResponse) {
+            public void onComplete(Response<AiMessage> response) {
                 sink.tryEmitComplete();
             }
 
