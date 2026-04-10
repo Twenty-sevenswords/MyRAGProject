@@ -1,0 +1,688 @@
+2026-04-10 14:51:58.137 [main] INFO  com.yizhaoqi.smartpai.MyRAGProject - Starting MyRAGProject using Java 17.0.12 with PID 15016 (D:\DeskTop\MyRAGProject\target\classes started by 28682 in D:\DeskTop\MyRAGProject)
+2026-04-10 14:51:58.144 [main] INFO  com.yizhaoqi.smartpai.MyRAGProject - No active profile set, falling back to 1 default profile: "default"
+2026-04-10 14:52:03.682 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-10 14:52:03.726 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-10 14:52:03.731 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-10 14:52:03.731 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-04-10 14:52:04.128 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-10 14:52:04.128 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5860 ms
+2026-04-10 14:52:05.753 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-10 14:52:16.645 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@49c4118b
+2026-04-10 14:52:16.653 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-10 14:52:16.807 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10 14:52:16.809 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-04-10 14:52:25.827 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: check - 对 AI 回答进行质量检查。评估回答的相关性、准确性、完整性、可读性。
+2026-04-10 14:52:25.828 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: qa - 使用 LLM 直接回答问题。适用于通用问答、闲聊、知识推理等场景。
+2026-04-10 14:52:25.830 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: rag_search - 从本地知识库检索相关文档并生成回答。当用户询问与知识库相关的问题时使用此技能。
+2026-04-10 14:52:25.830 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: web_search - 联网搜索获取实时信息。当本地知识库无结果或需要最新信息时使用此技能。
+2026-04-10 14:52:25.831 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: summarize - 对文本内容进行总结摘要。当用户需要总结、概括、提取要点时使用此技能。
+2026-04-10 14:52:25.831 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 注册技能: WebSearchTool - 网络搜索工具，用于获取实时信息
+2026-04-10 14:52:25.833 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP] 控制平面初始化完成，已注册 6 个技能，2 个前置路由器
+2026-04-10 14:52:25.833 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP]   - 路由器: DateTimeRouter (优先级: 10)
+2026-04-10 14:52:25.834 [main] INFO  com.yizhaoqi.smartpai.mcp.core.McpEngine - [MCP]   - 路由器: WebSearchRouter (优先级: 20)
+2026-04-10 14:52:26.344 [main] INFO  c.yizhaoqi.smartpai.langgraph.core.RagGraphBuilder - ========== 构建RAG状态图 ==========
+2026-04-10 14:52:26.346 [main] INFO  c.yizhaoqi.smartpai.langgraph.core.RagGraphBuilder - ========== RAG状态图构建完成 ==========
+2026-04-10 14:52:26.347 [main] INFO  c.yizhaoqi.smartpai.langgraph.core.RagGraphBuilder - 图节点: [memory, router, action, check]
+2026-04-10 14:52:26.393 [main] INFO  c.yizhaoqi.smartpai.config.LangChain4jStoreConfig - [LangChain4j Store] 初始化向量存储, type=MEMORY
+2026-04-10 14:52:26.394 [main] INFO  c.yizhaoqi.smartpai.config.LangChain4jStoreConfig - [LangChain4j Store] 创建内存向量存储
+2026-04-10 14:52:26.652 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-10 14:52:26.722 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-04-10 14:52:26.941 [main] DEBUG o.s.w.s.server.support.WebSocketHandlerMapping - Patterns [/chat/{token}, /ws/agent-chat, /ws/mcp] in 'webSocketHandlerMapping'
+2026-04-10 14:52:27.130 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 44 mappings in 'requestMappingHandlerMapping'
+2026-04-10 14:52:27.222 [main] DEBUG o.s.web.servlet.handler.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /static/**] in 'resourceHandlerMapping'
+2026-04-10 14:52:27.309 [main] INFO  com.yizhaoqi.smartpai.config.SecurityConfig - Security configuration loaded successfully.
+2026-04-10 14:52:27.385 [main] DEBUG o.s.security.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, JwtAuthenticationFilter, OrgTagAuthorizationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-04-10 14:52:27.924 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-04-10 14:52:28.031 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-04-10 14:52:30.781 [kafka-admin-client-thread | adminclient-1] WARN  org.apache.kafka.clients.admin.KafkaAdminClient - [AdminClient clientId=adminclient-1] The DescribeTopicPartitions API is not supported, using Metadata API to describe topics.
+2026-04-10 14:52:31.119 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-10 14:52:31.143 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-10 14:52:31.456 [main] INFO  com.yizhaoqi.smartpai.MyRAGProject - Started MyRAGProject in 34.906 seconds (process running for 37.199)
+2026-04-10 14:52:31.465 [main] INFO  com.yizhaoqi.smartpai.config.AdminUserInitializer - 检查管理员账号是否存在: admin
+2026-04-10 14:52:32.075 [main] INFO  com.yizhaoqi.smartpai.config.AdminUserInitializer - 管理员账号 'admin' 已存在，跳过创建步骤
+2026-04-10 14:52:32.321 [main] INFO  com.yizhaoqi.smartpai.config.OrgTagInitializer - 检查组织标签是否存在: default
+2026-04-10 14:52:32.430 [main] INFO  com.yizhaoqi.smartpai.config.OrgTagInitializer - 组织标签 'default' 已存在，跳过创建步骤
+2026-04-10 14:52:32.430 [main] INFO  com.yizhaoqi.smartpai.config.OrgTagInitializer - 检查组织标签是否存在: admin
+2026-04-10 14:52:32.522 [main] INFO  com.yizhaoqi.smartpai.config.OrgTagInitializer - 组织标签 'admin' 已存在，跳过创建步骤
+2026-04-10 14:52:32.522 [main] INFO  com.yizhaoqi.smartpai.config.OrgTagInitializer - 组织标签初始化完成
+2026-04-10 14:52:34.808 [main] INFO  com.yizhaoqi.smartpai.config.EsIndexInitializer - 索引 'knowledge_base' 已创建
+2026-04-10 14:55:53.021 [http-nio-8081-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-10 14:55:53.022 [http-nio-8081-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-10 14:55:53.023 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2026-04-10 14:55:53.024 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2026-04-10 14:55:53.024 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2026-04-10 14:55:53.027 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@64414574
+2026-04-10 14:55:53.027 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@480f757
+2026-04-10 14:55:53.028 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-04-10 14:55:53.028 [http-nio-8081-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 5 ms
+2026-04-10 14:55:53.084 [http-nio-8081-exec-1] DEBUG org.springframework.security.web.FilterChainProxy - Securing POST /api/v1/users/login
+2026-04-10 14:55:53.111 [http-nio-8081-exec-1] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-04-10 14:55:53.115 [http-nio-8081-exec-1] DEBUG org.springframework.security.web.FilterChainProxy - Secured POST /api/v1/users/login
+2026-04-10 14:55:53.124 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - POST "/api/v1/users/login", parameters={}
+2026-04-10 14:55:53.129 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#login(UserRequest)
+2026-04-10 14:55:53.385 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [UserRequest[username=admin, password=admin123]]
+2026-04-10 14:55:55.892 [http-nio-8081-exec-1] DEBUG com.yizhaoqi.smartpai.service.TokenCacheService - Token cached: 926b3b530d794045b50407fc176f5c44 for user: admin
+2026-04-10 14:55:55.892 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.utils.JwtUtils - Token generated and cached for user: admin, tokenId: 926b3b530d794045b50407fc176f5c44
+2026-04-10 14:55:56.091 [http-nio-8081-exec-1] DEBUG com.yizhaoqi.smartpai.service.TokenCacheService - Refresh token cached: 79c5b369c14b4e7cbcc1c3e3aa9740a6 for user: 1
+2026-04-10 14:55:56.091 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.utils.JwtUtils - Refresh token generated and cached for user: admin, refreshTokenId: 79c5b369c14b4e7cbcc1c3e3aa9740a6
+2026-04-10 14:55:56.119 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:55:56.121 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={token=eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0 (truncated)...]
+2026-04-10 14:55:56.151 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:55:56.173 [http-nio-8081-exec-2] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:55:56.679 [http-nio-8081-exec-2] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:55:56.679 [http-nio-8081-exec-2] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:55:56.679 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:55:56.914 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:55:56.914 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:55:56.932 [http-nio-8081-exec-2] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:55:57.314 [http-nio-8081-exec-4] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:55:57.945 [http-nio-8081-exec-4] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:55:57.945 [http-nio-8081-exec-4] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:55:57.947 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:55:58.146 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:55:58.146 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:55:58.153 [http-nio-8081-exec-4] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:55:59.542 [http-nio-8081-exec-3] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/conversation?start_date=2026-04-03&end_date=2026-04-11
+2026-04-10 14:55:59.758 [http-nio-8081-exec-5] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g
+2026-04-10 14:55:59.759 [http-nio-8081-exec-5] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-04-10 14:55:59.760 [http-nio-8081-exec-5] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g
+2026-04-10 14:55:59.761 [http-nio-8081-exec-5] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g", parameters={}
+2026-04-10 14:55:59.761 [http-nio-8081-exec-5] DEBUG o.s.w.s.server.support.WebSocketHandlerMapping - Mapped to org.springframework.web.socket.server.support.WebSocketHttpRequestHandler@6b1c5a41
+2026-04-10 14:55:59.766 [http-nio-8081-exec-5] DEBUG o.s.w.s.server.support.WebSocketHttpRequestHandler - GET /chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g
+2026-04-10 14:55:59.848 [http-nio-8081-exec-5] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 101 SWITCHING_PROTOCOLS
+2026-04-10 14:55:59.885 [http-nio-8081-exec-5] DEBUG o.s.w.s.handler.LoggingWebSocketHandlerDecorator - New StandardWebSocketSession[id=0de19445-d61f-23d2-5d09-2bc6322f79d4, uri=ws://localhost:8081/chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g]
+2026-04-10 14:55:59.892 [http-nio-8081-exec-5] INFO  c.yizhaoqi.smartpai.handler.ChatWebSocketHandler - WebSocket连接已建立，用户ID: admin，会话ID: 0de19445-d61f-23d2-5d09-2bc6322f79d4，URI路径: /chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g
+2026-04-10 14:56:00.165 [http-nio-8081-exec-3] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/conversation?start_date=2026-04-03&end_date=2026-04-11
+2026-04-10 14:56:00.166 [http-nio-8081-exec-3] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/conversation?start_date=2026-04-03&end_date=2026-04-11", parameters={masked}
+2026-04-10 14:56:00.167 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.ConversationController#getConversations(String, String, String)
+2026-04-10 14:56:00.826 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:00.827 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[{role=user, content=请介绍这份文档的主要内容, timestamp=2026-04-07T10:59:30}, {role=assistant,  (truncated)...]
+2026-04-10 14:56:00.834 [http-nio-8081-exec-3] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:07.099 [http-nio-8081-exec-6] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:56:07.676 [http-nio-8081-exec-6] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:56:07.676 [http-nio-8081-exec-6] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:56:07.676 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:56:07.735 [http-nio-8081-exec-8] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/admin/conversation?userid=1&start_date=2026-04-03&end_date=2026-04-11
+2026-04-10 14:56:07.735 [http-nio-8081-exec-7] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/admin/users/list?page=1&size=999&orgTag=default
+2026-04-10 14:56:07.768 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:07.768 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:56:07.778 [http-nio-8081-exec-6] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:08.081 [http-nio-8081-exec-8] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/admin/conversation?userid=1&start_date=2026-04-03&end_date=2026-04-11
+2026-04-10 14:56:08.083 [http-nio-8081-exec-8] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/admin/conversation?userid=1&start_date=2026-04-03&end_date=2026-04-11", parameters={masked}
+2026-04-10 14:56:08.083 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.AdminController#getAllConversations(String, String, String, String)
+2026-04-10 14:56:08.386 [http-nio-8081-exec-7] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/admin/users/list?page=1&size=999&orgTag=default
+2026-04-10 14:56:08.386 [http-nio-8081-exec-7] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/admin/users/list?page=1&size=999&orgTag=default", parameters={masked}
+2026-04-10 14:56:08.387 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.AdminController#getUserList(String, String, String, Integer, int, int)
+2026-04-10 14:56:09.471 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:09.472 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[{role=user, content=请介绍这份文档的主要内容, timestamp=2026-04-07T10:59:30, username=admin}, { (truncated)...]
+2026-04-10 14:56:09.481 [http-nio-8081-exec-8] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:09.612 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:09.614 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={number=1, size=999, totalPages=1, content=[{primaryOrg=default, createdAt=2026-04-0 (truncated)...]
+2026-04-10 14:56:09.620 [http-nio-8081-exec-7] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:11.787 [http-nio-8081-exec-9] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:56:12.069 [http-nio-8081-exec-9] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:56:12.069 [http-nio-8081-exec-9] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:56:12.069 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:56:12.160 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:12.160 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:56:12.164 [http-nio-8081-exec-9] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:13.838 [http-nio-8081-exec-10] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/documents/uploads
+2026-04-10 14:56:14.263 [http-nio-8081-exec-10] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理获取用户文档请求: /api/v1/documents/uploads
+2026-04-10 14:56:14.277 [http-nio-8081-exec-10] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/documents/uploads
+2026-04-10 14:56:14.277 [http-nio-8081-exec-10] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/documents/uploads", parameters={}
+2026-04-10 14:56:14.277 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.DocumentController#getUserUploadedFiles(String)
+2026-04-10 14:56:14.285 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.DocumentService - 获取用户上传的文件列表: userId=1
+2026-04-10 14:56:14.353 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功获取用户上传的文件列表: userId=1, fileCount=1
+2026-04-10 14:56:14.511 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:14.513 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[{createdAt=2026-04-09T19:55:41.859737, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, totalSi (truncated)...]
+2026-04-10 14:56:14.519 [http-nio-8081-exec-10] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:20.134 [http-nio-8081-exec-1] DEBUG org.springframework.security.web.FilterChainProxy - Securing DELETE /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:20.509 [http-nio-8081-exec-1] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理删除文档请求: /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:20.515 [http-nio-8081-exec-1] DEBUG org.springframework.security.web.FilterChainProxy - Secured DELETE /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:20.515 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - DELETE "/api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3", parameters={}
+2026-04-10 14:56:20.515 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.DocumentController#deleteDocument(String, String, String)
+2026-04-10 14:56:21.077 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 开始删除文档: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:21.613 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功从Elasticsearch删除文档: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:22.718 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功从MinIO删除文件: merged/Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:22.875 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功删除文档向量记录: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.038 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功删除文件上传记录: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.039 [http-nio-8081-exec-1] INFO  com.yizhaoqi.smartpai.service.DocumentService - 文档删除完成: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.569 [http-nio-8081-exec-2] DEBUG org.springframework.security.web.FilterChainProxy - Securing DELETE /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.589 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:23.589 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, message=文档删除成功}]
+2026-04-10 14:56:23.597 [http-nio-8081-exec-1] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:23.946 [http-nio-8081-exec-2] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理删除文档请求: /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.953 [http-nio-8081-exec-2] DEBUG org.springframework.security.web.FilterChainProxy - Secured DELETE /api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:23.953 [http-nio-8081-exec-2] DEBUG org.springframework.web.servlet.DispatcherServlet - DELETE "/api/v1/documents/6e11060d62bc6a1963c2c61d38ddd9c3", parameters={}
+2026-04-10 14:56:23.953 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.DocumentController#deleteDocument(String, String, String)
+2026-04-10 14:56:23.967 [http-nio-8081-exec-4] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/documents/uploads
+2026-04-10 14:56:24.150 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:24.152 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=404, message=文档不存在}]
+2026-04-10 14:56:24.157 [http-nio-8081-exec-2] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 404 NOT_FOUND
+2026-04-10 14:56:24.459 [http-nio-8081-exec-4] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理获取用户文档请求: /api/v1/documents/uploads
+2026-04-10 14:56:24.468 [http-nio-8081-exec-4] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/documents/uploads
+2026-04-10 14:56:24.468 [http-nio-8081-exec-4] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/documents/uploads", parameters={}
+2026-04-10 14:56:24.470 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.DocumentController#getUserUploadedFiles(String)
+2026-04-10 14:56:24.474 [http-nio-8081-exec-4] INFO  com.yizhaoqi.smartpai.service.DocumentService - 获取用户上传的文件列表: userId=1
+2026-04-10 14:56:24.889 [http-nio-8081-exec-4] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功获取用户上传的文件列表: userId=1, fileCount=0
+2026-04-10 14:56:24.892 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:24.892 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[], message=获取用户上传文件列表成功}]
+2026-04-10 14:56:24.895 [http-nio-8081-exec-4] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:27.998 [http-nio-8081-exec-5] DEBUG o.s.w.s.handler.LoggingWebSocketHandlerDecorator - StandardWebSocketSession[id=0de19445-d61f-23d2-5d09-2bc6322f79d4, uri=ws://localhost:8081/chat/eyJhbGciOiJIUzI1NiJ9.eyJwcmltYXJ5T3JnIjoiZGVmYXVsdCIsIm9yZ1RhZ3MiOiJkZWZhdWx0LGFkbWluIiwicm9sZSI6IkFETUlOIiwidG9rZW5JZCI6IjkyNmIzYjUzMGQ3OTQwNDViNTA0MDdmYzE3NmY1YzQ0IiwidXNlcklkIjoiMSIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzc1ODA3NzUzfQ.1z7oUqD5mga6tCjZ40Vpvu0PAldTfLpKlVbNaJyYJ2g] closed with CloseStatus[code=1000, reason=null]
+2026-04-10 14:56:28.003 [http-nio-8081-exec-5] INFO  c.yizhaoqi.smartpai.handler.ChatWebSocketHandler - WebSocket连接已关闭，用户ID: admin，会话ID: 0de19445-d61f-23d2-5d09-2bc6322f79d4，状态: CloseStatus[code=1000, reason=null]
+2026-04-10 14:56:29.114 [http-nio-8081-exec-3] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:56:29.657 [http-nio-8081-exec-3] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:56:29.657 [http-nio-8081-exec-3] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:56:29.659 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:56:29.750 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:29.750 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:56:29.762 [http-nio-8081-exec-3] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:29.836 [http-nio-8081-exec-6] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/users/me
+2026-04-10 14:56:30.091 [http-nio-8081-exec-6] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/users/me
+2026-04-10 14:56:30.092 [http-nio-8081-exec-6] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/users/me", parameters={}
+2026-04-10 14:56:30.092 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UserController#getCurrentUser(String)
+2026-04-10 14:56:30.192 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:30.192 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={id=1, username=admin, role=ADMIN, orgTags=[default, admin], primaryOrg=default, cre (truncated)...]
+2026-04-10 14:56:30.200 [http-nio-8081-exec-6] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:30.265 [http-nio-8081-exec-8] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/documents/uploads
+2026-04-10 14:56:30.562 [http-nio-8081-exec-8] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理获取用户文档请求: /api/v1/documents/uploads
+2026-04-10 14:56:30.570 [http-nio-8081-exec-8] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/documents/uploads
+2026-04-10 14:56:30.570 [http-nio-8081-exec-8] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/documents/uploads", parameters={}
+2026-04-10 14:56:30.572 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.DocumentController#getUserUploadedFiles(String)
+2026-04-10 14:56:30.576 [http-nio-8081-exec-8] INFO  com.yizhaoqi.smartpai.service.DocumentService - 获取用户上传的文件列表: userId=1
+2026-04-10 14:56:30.629 [http-nio-8081-exec-8] INFO  com.yizhaoqi.smartpai.service.DocumentService - 成功获取用户上传的文件列表: userId=1, fileCount=0
+2026-04-10 14:56:30.630 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:30.630 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[], message=获取用户上传文件列表成功}]
+2026-04-10 14:56:30.637 [http-nio-8081-exec-8] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:36.935 [http-nio-8081-exec-7] DEBUG org.springframework.security.web.FilterChainProxy - Securing GET /api/v1/admin/org-tags/tree
+2026-04-10 14:56:37.567 [http-nio-8081-exec-7] DEBUG org.springframework.security.web.FilterChainProxy - Secured GET /api/v1/admin/org-tags/tree
+2026-04-10 14:56:37.568 [http-nio-8081-exec-7] DEBUG org.springframework.web.servlet.DispatcherServlet - GET "/api/v1/admin/org-tags/tree", parameters={}
+2026-04-10 14:56:37.568 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.AdminController#getOrganizationTagTree(String)
+2026-04-10 14:56:38.278 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:38.278 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data=[{tagId=admin, parentTag=null, name=管理员组织, description=管理员专用组织标签，具有管理权限}, {tagId=def (truncated)...]
+2026-04-10 14:56:38.284 [http-nio-8081-exec-7] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:52.902 [http-nio-8081-exec-9] DEBUG org.springframework.security.web.FilterChainProxy - Securing POST /api/v1/upload/chunk
+2026-04-10 14:56:53.440 [http-nio-8081-exec-9] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理分片上传请求: /api/v1/upload/chunk
+2026-04-10 14:56:53.446 [http-nio-8081-exec-9] DEBUG org.springframework.security.web.FilterChainProxy - Secured POST /api/v1/upload/chunk
+2026-04-10 14:56:53.446 [http-nio-8081-exec-9] DEBUG org.springframework.web.servlet.DispatcherServlet - POST "/api/v1/upload/chunk", parameters={multipart}
+2026-04-10 14:56:53.518 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UploadController#uploadChunk(String, int, long, String, Integer, String, boolean, MultipartFile, String)
+2026-04-10 14:56:53.527 [http-nio-8081-exec-9] DEBUG c.y.smartpai.service.FileTypeValidationService - 开始验证文件类型: fileName=Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:53.527 [http-nio-8081-exec-9] DEBUG c.y.smartpai.service.FileTypeValidationService - 文件类型识别结果: fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, extension=docx, fileType=Word文档
+2026-04-10 14:56:53.527 [http-nio-8081-exec-9] INFO  c.y.smartpai.service.FileTypeValidationService - 文件类型验证通过: fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, extension=docx, fileType=Word文档
+2026-04-10 14:56:53.529 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - [uploadChunk] 开始处理分片上传请求 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, chunkIndex: 0, totalSize: 19964, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, contentType: application/octet-stream, fileSize: 19964, orgTag: admin, isPublic: true, userId: 1
+2026-04-10 14:56:53.683 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 检查文件记录是否存在 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, exists: false
+2026-04-10 14:56:53.683 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 创建新的文件记录 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, totalSize: 19964, userId: 1, orgTag: admin, isPublic: true
+2026-04-10 14:56:54.149 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件记录创建成功 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:54.149 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 检查分片是否已上传 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, chunkIndex: 0
+2026-04-10 14:56:54.198 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片上传状态 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, chunkIndex: 0, isUploaded: false
+2026-04-10 14:56:54.198 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 检查分片是否已上传 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0, isUploaded: false
+2026-04-10 14:56:54.282 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 检查数据库中分片信息 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0, exists: true
+2026-04-10 14:56:54.282 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 计算分片MD5 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0
+2026-04-10 14:56:54.297 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片MD5计算完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0, chunkMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:54.300 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 构建分片存储路径 => fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, path: chunks/6e11060d62bc6a1963c2c61d38ddd9c3/0
+2026-04-10 14:56:54.300 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始上传分片到MinIO => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, chunkIndex: 0, bucket: uploads, path: chunks/6e11060d62bc6a1963c2c61d38ddd9c3/0, size: 19964, contentType: application/octet-stream
+2026-04-10 14:56:54.646 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片上传到MinIO成功 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, chunkIndex: 0
+2026-04-10 14:56:54.647 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 标记分片为已上传 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0
+2026-04-10 14:56:54.647 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 标记分片为已上传 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, chunkIndex: 0
+2026-04-10 14:56:54.723 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片已标记为已上传 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, chunkIndex: 0
+2026-04-10 14:56:54.723 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片标记完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, chunkIndex: 0
+2026-04-10 14:56:54.723 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片处理完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, chunkIndex: 0
+2026-04-10 14:56:54.723 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 获取已上传分片列表 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:54.723 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 计算文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:54.802 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件总分片数计算结果 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalSize: 19964, chunkSize: 5242880, totalChunks: 1
+2026-04-10 14:56:54.802 [http-nio-8081-exec-9] DEBUG com.yizhaoqi.smartpai.service.UploadService - 文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalChunks: 1
+2026-04-10 14:56:54.948 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 获取到已上传分片列表 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, 已上传数量: 1, 总分片数: 1, 优化方式: 一次性获取
+2026-04-10 14:56:54.948 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 计算文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:55.020 [http-nio-8081-exec-9] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件总分片数计算结果 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalSize: 19964, chunkSize: 5242880, totalChunks: 1
+2026-04-10 14:56:55.023 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:55.024 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={uploaded=[0], progress=100.0}, message=分片上传成功}]
+2026-04-10 14:56:55.045 [http-nio-8081-exec-9] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:56:55.156 [http-nio-8081-exec-10] DEBUG org.springframework.security.web.FilterChainProxy - Securing POST /api/v1/upload/merge
+2026-04-10 14:56:55.397 [http-nio-8081-exec-10] INFO  c.y.smartpai.config.OrgTagAuthorizationFilter - 处理合并分片请求: /api/v1/upload/merge
+2026-04-10 14:56:55.407 [http-nio-8081-exec-10] DEBUG org.springframework.security.web.FilterChainProxy - Secured POST /api/v1/upload/merge
+2026-04-10 14:56:55.407 [http-nio-8081-exec-10] DEBUG org.springframework.web.servlet.DispatcherServlet - POST "/api/v1/upload/merge", parameters={}
+2026-04-10 14:56:55.407 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.yizhaoqi.smartpai.controller.UploadController#mergeFile(MergeRequest, String)
+2026-04-10 14:56:55.415 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [MergeRequest[fileMd5=6e11060d62bc6a1963c2c61d38ddd9c3, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx]]
+2026-04-10 14:56:55.568 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 获取已上传分片列表 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:55.568 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 计算文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:55.670 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件总分片数计算结果 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalSize: 19964, chunkSize: 5242880, totalChunks: 1
+2026-04-10 14:56:55.670 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalChunks: 1
+2026-04-10 14:56:55.840 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 获取到已上传分片列表 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, 已上传数量: 1, 总分片数: 1, 优化方式: 一次性获取
+2026-04-10 14:56:55.840 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 计算文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:55.910 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件总分片数计算结果 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalSize: 19964, chunkSize: 5242880, totalChunks: 1
+2026-04-10 14:56:55.911 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始合并文件分片 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:55.911 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 查询分片信息 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:55.955 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 查询到分片信息 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, 分片数量: 1
+2026-04-10 14:56:55.955 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 计算文件总分片数 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:56.082 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件总分片数计算结果 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, totalSize: 19964, chunkSize: 5242880, totalChunks: 1
+2026-04-10 14:56:56.082 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片路径列表 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, 路径数量: 1
+2026-04-10 14:56:56.083 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始检查每个分片是否存在 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:56.190 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片存在 => fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, index: 0, path: chunks/6e11060d62bc6a1963c2c61d38ddd9c3/0, size: 19964
+2026-04-10 14:56:56.190 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片检查完成，所有分片都存在 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:56.190 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始合并分片 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, 合并后路径: merged/Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:56.192 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 构建合并请求 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, targetPath: merged/Cvte广州ai开发一面 - 豆包优化排版.docx, sourcePaths: [chunks/6e11060d62bc6a1963c2c61d38ddd9c3/0]
+2026-04-10 14:56:56.381 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片合并成功 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, mergedPath: merged/Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:56.464 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 合并文件信息 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, path: merged/Cvte广州ai开发一面 - 豆包优化排版.docx, size: 19964
+2026-04-10 14:56:56.464 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始清理分片文件 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, 分片数量: 1
+2026-04-10 14:56:56.520 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 分片文件已删除 => fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, path: chunks/6e11060d62bc6a1963c2c61d38ddd9c3/0
+2026-04-10 14:56:56.521 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片文件清理完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:56.521 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 删除Redis中的分片状态记录 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:56.521 [http-nio-8081-exec-10] DEBUG com.yizhaoqi.smartpai.service.UploadService - 删除文件所有分片上传标记 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:56.595 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件分片上传标记已删除 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:56:56.595 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 分片状态记录已删除 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:56.595 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 更新文件状态为已完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:56.686 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 文件状态已更新为已完成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档
+2026-04-10 14:56:56.687 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 开始生成预签名URL => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, path: merged/Cvte广州ai开发一面 - 豆包优化排版.docx
+2026-04-10 14:56:56.691 [http-nio-8081-exec-10] INFO  com.yizhaoqi.smartpai.service.UploadService - 预签名URL已生成 => fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, fileName: Cvte广州ai开发一面 - 豆包优化排版.docx, fileType: Word文档, URL: http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a
+2026-04-10 14:56:57.978 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Received task: FileProcessingTask(fileMd5=6e11060d62bc6a1963c2c61d38ddd9c3, filePath=http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, userId=1, orgTag=admin, isPublic=true)
+2026-04-10 14:56:57.983 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - 文件权限信息: userId=1, orgTag=admin, isPublic=true
+2026-04-10 14:56:57.983 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Downloading file from storage: http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a
+2026-04-10 14:56:57.983 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Detected remote URL: http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a
+2026-04-10 14:56:58.261 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Successfully connected to URL, starting download...
+2026-04-10 14:56:58.261 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  com.yizhaoqi.smartpai.service.ParseService - 开始解析文件，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, userId: 1, orgTag: admin, isPublic: true
+2026-04-10 14:56:58.548 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-04-10 14:56:58.549 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.annotation.HttpEntityMethodProcessor - Writing [{code=200, data={object_url=http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC% (truncated)...]
+2026-04-10 14:56:58.553 [http-nio-8081-exec-10] DEBUG org.springframework.web.servlet.DispatcherServlet - Completed 200 OK
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文件元数据:
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - cp:revision: 3
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:AppVersion: 16.0000
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:paragraph-count: 4
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:word-count: 359
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Application: Microsoft Office Word
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:last-author: 2868227296@qq.com
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - X-TIKA:Parsed-By-Full-Set: org.apache.tika.parser.DefaultParser
+2026-04-10 14:57:00.574 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dc:creator: 22041216C
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Company: 
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - xmpTPg:NPages: 3
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dcterms:created: 2026-02-27T04:58:00Z
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:line-count: 17
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dcterms:modified: 2026-04-07T02:45:00Z
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:character-count: 2047
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Template: Normal.dotm
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:character-count-with-spaces: 2402
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - X-TIKA:Parsed-By: org.apache.tika.parser.DefaultParser
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:DocSecurityString: None
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:TotalTime: 3
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:page-count: 3
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dc:publisher: 
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - custom:ICV: 275f810d954a44cf81c624d90a07d0eb_21
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 提取的文本内容长度: 2296
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: # CVTE 广州 AI 开发一面面试记录（**全文修正+专业排版版**）已修正所有录音转写错误、口误、错别字、语句不通顺问题，保留真实面试逻辑，技术表述标准化。---## 一、开场与岗位介绍面试官：你好，现在可以听到吗？候选人：可以。面试官：你现在在郑州是吗？候选人：对，我在郑州。面试官：我们这个岗位你有大概了解吗？候选人：知道岗位在广州，是 AI 应用开发岗，面试前有了解过。面试官：我指的是岗位本身。我们 AI 应用开发不只是后端开发，还需要前端、需求挖掘分析、方案设计、落地开发及后续运维，涉及面较广。部门两大方向：1. AI 应用开发，前后端全栈独立完成2. 偏平台开发，结合 AI 能力的传统开发我看你简历意向是后端，实习项目是 RAG 问答平台，偏向平台开发，和我们方向匹配。你能接受吗？候选人：可以，没问题。---## 二、求职动机与职业规划面试官：你目前还在数字马力实习是吗？候选人：对，还在实习。面试官：那边给了秋招 Offer 吗？为什么没接受，重新找工作？候选人：给了玩法相关岗位。主要因为在郑州做蚂蚁生态业务，长期技术深度不足，不利于职业发展，我想走**技术路线**。面试官：AI 出现后，技术框
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: 架和传统开发差异很大，发展路径不固定，你怎么看？候选人：AI 不是替代开发者，而是**提效工具**。以前要手动啃消息队列等高阶技术，现在 AI 能辅助提升效率；未来大模型应用落地是主流方向，我想深耕 AI 应用开发。面试官：你未来希望成为什么样的角色？候选人：希望做 AI 应用开发、大模型落地，用 RAG 等技术做实际业务落地。---## 三、薪资与工作时间面试官：你对工作时间、薪资有什么期待？候选人：不太了解公司薪资结构，更看重成长。面试官：你现在实习薪资多少？候选人：数字马力给到 10k，毕业表现好可加到 12–13k，14–16 薪左右。面试官：能接受我们工作时长吗？早 9 点上班，平常 7 点左右下班，忙时到 9–10 点。候选人：可以接受。---## 四、项目实操提问（RAG 问答平台）面试官：介绍一下你的项目。候选人：这是网页版问答平台，用户可上传文件，输入问题后，大模型基于文档内容整合给出答案。核心流程：文件上传→解析→分片→向量转换→向量检索→问答生成。面试官：用户面向 C 端？角色有哪些？候选人：面向 C 端用户，分管理员和普通用户；不限定领域，上传什么文档就回答对应领域内容。面试官：文件上
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: 传后怎么处理？向量转换用的什么？候选人：大文件先拆分，调用**豆包 API**把文本转为向量；用户提问时做**向量相似度检索**，不做纯文字匹配，使用**Milvus/FAISS**做向量检索与匹配。面试官：不同文件类型（PDF、TXT）怎么解析？图文、表格怎么处理？候选人：提前适配文件类型，调用解析库转为纯文本；图文混排、表格暂未处理，只支持纯文本场景。面试官：文档分片策略是什么？候选人：参考业界通用方案，按**16KB 大小分片**，适配向量模型输入要求；部分分片逻辑由框架自动处理，保证检索效果最优。面试官：Prompt 怎么设计？候选人：写在配置文件中，定义大模型角色为文档问答助手，指定输出格式；用户问题直接拼接系统 Prompt 调用。面试官：RAG 多轮召回、跨分片对比类问题怎么处理？了解 Agent 吗？候选人：没考虑过跨分片多轮召回场景；了解 Agent，用过蚂蚁 MCP 工具调用，类似 Coze 平台，但**未独立开发过 Agent 应用**。Agent 目前缺点是 Token 消耗大，简单任务效率不如传统代码。面试官：项目中遇到最难的问题是什么？怎么解决？候选人：技术问题大多可通过文档与 A
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: I 辅助解决，无明显卡点。面试官：遇到不熟悉的问题，你的调研和解决思路是什么？候选人：先查技术社区与行业方案；再请教同事/师兄；复杂问题**拆分成小模块**，吃透底层原理后逐步解决。面试官：如果财务部门每天处理 100 张发票很繁琐，你怎么出 AI 解决方案？候选人：做**自动报账 AI 应用**，把财务规则、报销知识库整理成文档，用 AI 自动解析发票信息、生成处理建议，经人工确认后完成报销/入账，实现自动化提效。---## 五、实习经历与氛围面试官：你实习项目是一个人做的吗？候选人：对，独立完成。面试官：实习中遇到过不公平的事吗？候选人：公司氛围很好。之前做消息通知功能，测试时误给大老板发了近百条钉钉测试消息，组长批评后未追责，团队很包容。---## 六、候选人提问候选人：咱们公司 AI 开发岗位未来方向、个人发展路径是什么？面试官：部门核心两大方向：1. **内部 AI 应用提效**：不限技术栈，用程序/AI/自动化解决集团内部痛点，全流程负责需求到落地运维。2. **AI 平台 + 基建开发**：搭建集团内部 AI 应用平台（类似 RAG/低代码平台），让非开发人员也能使用 AI；同时提供大模型网关、
+2026-04-10 14:57:00.576 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: RAG 能力平台、MCP 工具平台等底层基建，结合传统开发与 AI 技术。内部有完善的纯技术职级体系。候选人：是做类似 Coze 这类平台，还是内部网页工具？面试官：类似你做的 RAG 应用平台，同时提供底层 AI 能力基建，支撑全集团业务集成 AI 能力。---## 七、面试结束面试官：还有其他问题吗？候选人：没有了。面试官：好的，今天面试就到这里，谢谢你的时间。候选人：谢谢面试官，再见。---需要我再帮你把这份面试里**技术易错点、扣分回答、优化话术**单独整理成一份**复盘清单**吗？
+2026-04-10 14:57:03.641 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  com.yizhaoqi.smartpai.service.ParseService - 文件解析完成，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:57:03.641 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - 文件解析完成，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:57:03.641 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.yizhaoqi.smartpai.service.VectorizationService - 开始向量化文件，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, userId: 1, orgTag: admin, isPublic: true
+2026-04-10 14:57:04.097 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.service.LangChain4jEmbeddingService - [LangChain4j] 批量向量化: count=5
+2026-04-10 14:57:06.476 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.service.LangChain4jEmbeddingService - [LangChain4j] 向量化完成: count=5
+2026-04-10 14:57:06.480 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.yizhaoqi.smartpai.service.ElasticsearchService - 开始批量索引文档到Elasticsearch，文档数量: 5
+2026-04-10 14:57:07.593 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 批量索引过程中发生错误:
+2026-04-10 14:57:07.594 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 14c08f8c-16c4-4bcd-b5cb-faa7c20d4de8, 错误: [1:14395] failed to parse: The [dense_vector] field [vector] in doc [document with id '14c08f8c-16c4-4bcd-b5cb-faa7c20d4de8'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:07.594 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 87d88747-6cc2-4807-9ee2-9257b01862e9, 错误: [1:14393] failed to parse: The [dense_vector] field [vector] in doc [document with id '87d88747-6cc2-4807-9ee2-9257b01862e9'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:07.595 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 88404c1c-47fb-4d68-a8ba-91d5d6a92d9a, 错误: [1:14285] failed to parse: The [dense_vector] field [vector] in doc [document with id '88404c1c-47fb-4d68-a8ba-91d5d6a92d9a'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:07.595 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 3c95b8b0-90fa-4e15-afb2-70ace4b722da, 错误: [1:14386] failed to parse: The [dense_vector] field [vector] in doc [document with id '3c95b8b0-90fa-4e15-afb2-70ace4b722da'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:07.595 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 1a3495be-6a21-4a2c-9501-e2f427d81511, 错误: [1:13598] failed to parse: The [dense_vector] field [vector] in doc [document with id '1a3495be-6a21-4a2c-9501-e2f427d81511'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:07.595 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 批量索引失败，文档数量: 5
+java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2026-04-10 14:57:07.602 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.VectorizationService - 向量化失败，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
+2026-04-10 14:57:07.602 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.y.smartpai.consumer.FileProcessingConsumer - Error processing task: FileProcessingTask(fileMd5=6e11060d62bc6a1963c2c61d38ddd9c3, filePath=http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, userId=1, orgTag=admin, isPublic=true)
+java.lang.RuntimeException: 向量化失败
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:83)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	... 26 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
+2026-04-10 14:57:10.630 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR o.s.kafka.listener.KafkaMessageListenerContainer - Error handler threw an exception
+org.springframework.kafka.KafkaException: Seek to current after exception
+	at org.springframework.kafka.listener.SeekUtils.seekOrRecover(SeekUtils.java:227)
+	at org.springframework.kafka.listener.DefaultErrorHandler.handleRemaining(DefaultErrorHandler.java:168)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeErrorHandler(KafkaMessageListenerContainer.java:2836)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2713)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method 'public void com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(com.yizhaoqi.smartpai.model.FileProcessingTask)' threw exception
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.decorateException(KafkaMessageListenerContainer.java:2869)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2814)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	... 10 common frames omitted
+	Suppressed: org.springframework.kafka.listener.ListenerExecutionFailedException: Restored Stack Trace
+		at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:435)
+		at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+		at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+		at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+		at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+Caused by: java.lang.RuntimeException: Error processing task
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:67)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	... 12 common frames omitted
+Caused by: java.lang.RuntimeException: 向量化失败
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:83)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	... 25 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	... 26 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
+2026-04-10 14:57:10.743 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Received task: FileProcessingTask(fileMd5=6e11060d62bc6a1963c2c61d38ddd9c3, filePath=http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, userId=1, orgTag=admin, isPublic=true)
+2026-04-10 14:57:10.744 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - 文件权限信息: userId=1, orgTag=admin, isPublic=true
+2026-04-10 14:57:10.744 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Downloading file from storage: http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a
+2026-04-10 14:57:10.744 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Detected remote URL: http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a
+2026-04-10 14:57:11.032 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - Successfully connected to URL, starting download...
+2026-04-10 14:57:11.032 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  com.yizhaoqi.smartpai.service.ParseService - 开始解析文件，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, userId: 1, orgTag: admin, isPublic: true
+2026-04-10 14:57:11.270 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文件元数据:
+2026-04-10 14:57:11.270 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - cp:revision: 3
+2026-04-10 14:57:11.270 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:AppVersion: 16.0000
+2026-04-10 14:57:11.270 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:paragraph-count: 4
+2026-04-10 14:57:11.270 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:word-count: 359
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Application: Microsoft Office Word
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:last-author: 2868227296@qq.com
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - X-TIKA:Parsed-By-Full-Set: org.apache.tika.parser.DefaultParser
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dc:creator: 22041216C
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Company: 
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - xmpTPg:NPages: 3
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dcterms:created: 2026-02-27T04:58:00Z
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:line-count: 17
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dcterms:modified: 2026-04-07T02:45:00Z
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:character-count: 2047
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:Template: Normal.dotm
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:character-count-with-spaces: 2402
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - X-TIKA:Parsed-By: org.apache.tika.parser.DefaultParser
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:DocSecurityString: None
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - extended-properties:TotalTime: 3
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - meta:page-count: 3
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - dc:publisher: 
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - custom:ICV: 275f810d954a44cf81c624d90a07d0eb_21
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 提取的文本内容长度: 2296
+2026-04-10 14:57:11.271 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: # CVTE 广州 AI 开发一面面试记录（**全文修正+专业排版版**）已修正所有录音转写错误、口误、错别字、语句不通顺问题，保留真实面试逻辑，技术表述标准化。---## 一、开场与岗位介绍面试官：你好，现在可以听到吗？候选人：可以。面试官：你现在在郑州是吗？候选人：对，我在郑州。面试官：我们这个岗位你有大概了解吗？候选人：知道岗位在广州，是 AI 应用开发岗，面试前有了解过。面试官：我指的是岗位本身。我们 AI 应用开发不只是后端开发，还需要前端、需求挖掘分析、方案设计、落地开发及后续运维，涉及面较广。部门两大方向：1. AI 应用开发，前后端全栈独立完成2. 偏平台开发，结合 AI 能力的传统开发我看你简历意向是后端，实习项目是 RAG 问答平台，偏向平台开发，和我们方向匹配。你能接受吗？候选人：可以，没问题。---## 二、求职动机与职业规划面试官：你目前还在数字马力实习是吗？候选人：对，还在实习。面试官：那边给了秋招 Offer 吗？为什么没接受，重新找工作？候选人：给了玩法相关岗位。主要因为在郑州做蚂蚁生态业务，长期技术深度不足，不利于职业发展，我想走**技术路线**。面试官：AI 出现后，技术框
+2026-04-10 14:57:11.272 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: 架和传统开发差异很大，发展路径不固定，你怎么看？候选人：AI 不是替代开发者，而是**提效工具**。以前要手动啃消息队列等高阶技术，现在 AI 能辅助提升效率；未来大模型应用落地是主流方向，我想深耕 AI 应用开发。面试官：你未来希望成为什么样的角色？候选人：希望做 AI 应用开发、大模型落地，用 RAG 等技术做实际业务落地。---## 三、薪资与工作时间面试官：你对工作时间、薪资有什么期待？候选人：不太了解公司薪资结构，更看重成长。面试官：你现在实习薪资多少？候选人：数字马力给到 10k，毕业表现好可加到 12–13k，14–16 薪左右。面试官：能接受我们工作时长吗？早 9 点上班，平常 7 点左右下班，忙时到 9–10 点。候选人：可以接受。---## 四、项目实操提问（RAG 问答平台）面试官：介绍一下你的项目。候选人：这是网页版问答平台，用户可上传文件，输入问题后，大模型基于文档内容整合给出答案。核心流程：文件上传→解析→分片→向量转换→向量检索→问答生成。面试官：用户面向 C 端？角色有哪些？候选人：面向 C 端用户，分管理员和普通用户；不限定领域，上传什么文档就回答对应领域内容。面试官：文件上
+2026-04-10 14:57:11.272 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: 传后怎么处理？向量转换用的什么？候选人：大文件先拆分，调用**豆包 API**把文本转为向量；用户提问时做**向量相似度检索**，不做纯文字匹配，使用**Milvus/FAISS**做向量检索与匹配。面试官：不同文件类型（PDF、TXT）怎么解析？图文、表格怎么处理？候选人：提前适配文件类型，调用解析库转为纯文本；图文混排、表格暂未处理，只支持纯文本场景。面试官：文档分片策略是什么？候选人：参考业界通用方案，按**16KB 大小分片**，适配向量模型输入要求；部分分片逻辑由框架自动处理，保证检索效果最优。面试官：Prompt 怎么设计？候选人：写在配置文件中，定义大模型角色为文档问答助手，指定输出格式；用户问题直接拼接系统 Prompt 调用。面试官：RAG 多轮召回、跨分片对比类问题怎么处理？了解 Agent 吗？候选人：没考虑过跨分片多轮召回场景；了解 Agent，用过蚂蚁 MCP 工具调用，类似 Coze 平台，但**未独立开发过 Agent 应用**。Agent 目前缺点是 Token 消耗大，简单任务效率不如传统代码。面试官：项目中遇到最难的问题是什么？怎么解决？候选人：技术问题大多可通过文档与 A
+2026-04-10 14:57:11.272 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: I 辅助解决，无明显卡点。面试官：遇到不熟悉的问题，你的调研和解决思路是什么？候选人：先查技术社区与行业方案；再请教同事/师兄；复杂问题**拆分成小模块**，吃透底层原理后逐步解决。面试官：如果财务部门每天处理 100 张发票很繁琐，你怎么出 AI 解决方案？候选人：做**自动报账 AI 应用**，把财务规则、报销知识库整理成文档，用 AI 自动解析发票信息、生成处理建议，经人工确认后完成报销/入账，实现自动化提效。---## 五、实习经历与氛围面试官：你实习项目是一个人做的吗？候选人：对，独立完成。面试官：实习中遇到过不公平的事吗？候选人：公司氛围很好。之前做消息通知功能，测试时误给大老板发了近百条钉钉测试消息，组长批评后未追责，团队很包容。---## 六、候选人提问候选人：咱们公司 AI 开发岗位未来方向、个人发展路径是什么？面试官：部门核心两大方向：1. **内部 AI 应用提效**：不限技术栈，用程序/AI/自动化解决集团内部痛点，全流程负责需求到落地运维。2. **AI 平台 + 基建开发**：搭建集团内部 AI 应用平台（类似 RAG/低代码平台），让非开发人员也能使用 AI；同时提供大模型网关、
+2026-04-10 14:57:11.272 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] DEBUG com.yizhaoqi.smartpai.service.ParseService - 文本块: RAG 能力平台、MCP 工具平台等底层基建，结合传统开发与 AI 技术。内部有完善的纯技术职级体系。候选人：是做类似 Coze 这类平台，还是内部网页工具？面试官：类似你做的 RAG 应用平台，同时提供底层 AI 能力基建，支撑全集团业务集成 AI 能力。---## 七、面试结束面试官：还有其他问题吗？候选人：没有了。面试官：好的，今天面试就到这里，谢谢你的时间。候选人：谢谢面试官，再见。---需要我再帮你把这份面试里**技术易错点、扣分回答、优化话术**单独整理成一份**复盘清单**吗？
+2026-04-10 14:57:14.290 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  com.yizhaoqi.smartpai.service.ParseService - 文件解析完成，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:57:14.290 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.consumer.FileProcessingConsumer - 文件解析完成，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+2026-04-10 14:57:14.290 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.yizhaoqi.smartpai.service.VectorizationService - 开始向量化文件，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3, userId: 1, orgTag: admin, isPublic: true
+2026-04-10 14:57:14.448 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.service.LangChain4jEmbeddingService - [LangChain4j] 批量向量化: count=10
+2026-04-10 14:57:15.606 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.y.smartpai.service.LangChain4jEmbeddingService - [LangChain4j] 向量化完成: count=10
+2026-04-10 14:57:15.607 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.yizhaoqi.smartpai.service.ElasticsearchService - 开始批量索引文档到Elasticsearch，文档数量: 10
+2026-04-10 14:57:15.894 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 批量索引过程中发生错误:
+2026-04-10 14:57:15.894 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 86af2fc9-2350-4a0d-a935-ca7c6e97da58, 错误: [1:14395] failed to parse: The [dense_vector] field [vector] in doc [document with id '86af2fc9-2350-4a0d-a935-ca7c6e97da58'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.894 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 29e156c9-80b4-45ee-b989-97fe38273012, 错误: [1:14393] failed to parse: The [dense_vector] field [vector] in doc [document with id '29e156c9-80b4-45ee-b989-97fe38273012'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.894 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: b092e198-c893-45b3-8a34-945dfd962990, 错误: [1:14285] failed to parse: The [dense_vector] field [vector] in doc [document with id 'b092e198-c893-45b3-8a34-945dfd962990'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.894 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 8f4f52bc-53e0-4d0a-b825-67aa783177a7, 错误: [1:14386] failed to parse: The [dense_vector] field [vector] in doc [document with id '8f4f52bc-53e0-4d0a-b825-67aa783177a7'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: e5411558-4882-4bb0-a669-fc65d7a37f6b, 错误: [1:13598] failed to parse: The [dense_vector] field [vector] in doc [document with id 'e5411558-4882-4bb0-a669-fc65d7a37f6b'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 750e501e-2e20-4db3-8315-1bab31de4863, 错误: [1:14395] failed to parse: The [dense_vector] field [vector] in doc [document with id '750e501e-2e20-4db3-8315-1bab31de4863'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 5df94615-1aea-4959-bc70-853f5f19f82c, 错误: [1:14393] failed to parse: The [dense_vector] field [vector] in doc [document with id '5df94615-1aea-4959-bc70-853f5f19f82c'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 9d95ab14-aa9c-4e27-b1d7-0c66b40f6475, 错误: [1:14285] failed to parse: The [dense_vector] field [vector] in doc [document with id '9d95ab14-aa9c-4e27-b1d7-0c66b40f6475'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: a06a1aea-6423-4822-aba4-5c9cc933a398, 错误: [1:14386] failed to parse: The [dense_vector] field [vector] in doc [document with id 'a06a1aea-6423-4822-aba4-5c9cc933a398'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 文档索引失败 - ID: 32498092-595a-41f7-894a-fd38a00133a3, 错误: [1:13598] failed to parse: The [dense_vector] field [vector] in doc [document with id '32498092-595a-41f7-894a-fd38a00133a3'] has more dimensions than defined in the mapping [1024]
+2026-04-10 14:57:15.896 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.ElasticsearchService - 批量索引失败，文档数量: 10
+java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2026-04-10 14:57:15.897 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.yizhaoqi.smartpai.service.VectorizationService - 向量化失败，fileMd5: 6e11060d62bc6a1963c2c61d38ddd9c3
+java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
+2026-04-10 14:57:15.898 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR c.y.smartpai.consumer.FileProcessingConsumer - Error processing task: FileProcessingTask(fileMd5=6e11060d62bc6a1963c2c61d38ddd9c3, filePath=http://47.95.255.221:9000/uploads/merged/Cvte%E5%B9%BF%E5%B7%9Eai%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%20-%20%E8%B1%86%E5%8C%85%E4%BC%98%E5%8C%96%E6%8E%92%E7%89%88.docx?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20260410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260410T065656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0d7318973b3417683847f2742897928e115d5ffd340ec1989523d01ed973527a, fileName=Cvte广州ai开发一面 - 豆包优化排版.docx, userId=1, orgTag=admin, isPublic=true)
+java.lang.RuntimeException: 向量化失败
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:83)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	... 26 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
+2026-04-10 14:57:15.999 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] ERROR o.s.kafka.listener.KafkaMessageListenerContainer - Error handler threw an exception
+org.springframework.kafka.KafkaException: Seek to current after exception
+	at org.springframework.kafka.listener.SeekUtils.seekOrRecover(SeekUtils.java:227)
+	at org.springframework.kafka.listener.DefaultErrorHandler.handleRemaining(DefaultErrorHandler.java:168)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeErrorHandler(KafkaMessageListenerContainer.java:2836)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2713)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2699)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2541)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2430)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2085)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1461)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1426)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1296)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method 'public void com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(com.yizhaoqi.smartpai.model.FileProcessingTask)' threw exception
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.decorateException(KafkaMessageListenerContainer.java:2869)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2814)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2778)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.lambda$doInvokeRecordListener$53(KafkaMessageListenerContainer.java:2701)
+	... 10 common frames omitted
+	Suppressed: org.springframework.kafka.listener.ListenerExecutionFailedException: Restored Stack Trace
+		at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:435)
+		at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+		at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+		at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+		at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+Caused by: java.lang.RuntimeException: Error processing task
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:67)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:169)
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:45)
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119)
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:70)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:420)
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:384)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:85)
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:50)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2800)
+	... 12 common frames omitted
+Caused by: java.lang.RuntimeException: 向量化失败
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:83)
+	at com.yizhaoqi.smartpai.consumer.FileProcessingConsumer.processTask(FileProcessingConsumer.java:61)
+	... 25 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引失败
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:67)
+	at com.yizhaoqi.smartpai.service.VectorizationService.vectorize(VectorizationService.java:78)
+	... 26 common frames omitted
+Caused by: java.lang.RuntimeException: 批量索引部分失败，请检查日志
+	at com.yizhaoqi.smartpai.service.ElasticsearchService.bulkIndex(ElasticsearchService.java:60)
+	... 27 common frames omitted
