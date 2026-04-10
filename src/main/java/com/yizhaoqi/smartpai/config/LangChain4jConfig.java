@@ -12,13 +12,10 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
-/**
- * LangChain4j 配置类
- * 配置 LLM、Embedding 模型等核心组件
- */
 @Configuration
 public class LangChain4jConfig {
 
+    // 对话模型配置
     @Value("${deepseek.api.url:https://api.deepseek.com}")
     private String apiUrl;
 
@@ -27,9 +24,6 @@ public class LangChain4jConfig {
 
     @Value("${deepseek.api.model:deepseek-chat}")
     private String model;
-
-    @Value("${deepseek.api.embedding-model:text-embedding-3-small}")
-    private String embeddingModel;
 
     @Value("${deepseek.api.temperature:0.3}")
     private Double temperature;
@@ -40,9 +34,19 @@ public class LangChain4jConfig {
     @Value("${deepseek.api.timeout:60}")
     private Integer timeoutSeconds;
 
-    /**
-     * 同步聊天模型（用于 Agent 意图识别、质检等）
-     */
+    // ===================== 修复：向量模型独立配置 =====================
+    @Value("${embedding.api.url}")
+    private String embeddingApiUrl;
+
+    @Value("${embedding.api.key}")
+    private String embeddingApiKey;
+
+    @Value("${embedding.api.model}")
+    private String embeddingModel;
+    @Value("${embedding.api.dimension}")
+    private Integer embeddingDimension;
+
+    // 同步对话模型
     @Bean
     public ChatLanguageModel chatLanguageModel() {
         return OpenAiChatModel.builder()
@@ -55,9 +59,7 @@ public class LangChain4jConfig {
                 .build();
     }
 
-    /**
-     * 流式聊天模型（用于实时对话）
-     */
+    // 流式对话模型
     @Bean
     public StreamingChatLanguageModel streamingChatLanguageModel() {
         return OpenAiStreamingChatModel.builder()
@@ -70,15 +72,14 @@ public class LangChain4jConfig {
                 .build();
     }
 
-    /**
-     * Embedding 模型（用于向量化）
-     */
+    // ===================== 修复：向量模型使用正确的地址和key =====================
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
-                .baseUrl(apiUrl)
-                .apiKey(apiKey)
+                .baseUrl(embeddingApiUrl)    // ✅ 向量地址
+                .apiKey(embeddingApiKey)     // ✅ 向量key
                 .modelName(embeddingModel)
+                .dimensions(embeddingDimension)
                 .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
     }

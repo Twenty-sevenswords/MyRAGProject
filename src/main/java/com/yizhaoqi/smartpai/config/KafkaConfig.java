@@ -1,12 +1,15 @@
 package com.yizhaoqi.smartpai.config;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -20,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = false)
 public class KafkaConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
@@ -47,6 +51,21 @@ public class KafkaConfig {
 
     public String getFileProcessingGroupId() {
         return fileProcessingGroupId;
+    }
+    @Bean
+    public NewTopic fileProcessingTopic() {
+        return TopicBuilder.name(fileProcessingTopic)
+                .partitions(1)    // 单节点：分区1
+                .replicas(1)      // 单节点：副本1 → 解决报错！
+                .build();
+    }
+
+    @Bean
+    public NewTopic fileProcessingDltTopic() {
+        return TopicBuilder.name(fileProcessingDltTopic)
+                .partitions(1)
+                .replicas(1)
+                .build();
     }
 
     @Bean

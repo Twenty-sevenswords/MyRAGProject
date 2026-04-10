@@ -41,21 +41,29 @@ public class LangChain4jEmbeddingService {
      */
     public List<float[]> embedBatch(List<String> texts) {
         logger.info("[LangChain4j] 批量向量化: count={}", texts.size());
-        
-        List<TextSegment> segments = new ArrayList<>();
-        for (String text : texts) {
-            segments.add(TextSegment.from(text));
+
+        List<float[]> allVectors = new ArrayList<>();
+        // 每次只发 10 条，解决接口限制
+        int batchSize = 10;
+
+        for (int i = 0; i < texts.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, texts.size());
+            List<String> batchTexts = texts.subList(i, end);
+
+            List<TextSegment> segments = new ArrayList<>();
+            for (String text : batchTexts) {
+                segments.add(TextSegment.from(text));
+            }
+
+            Response<List<Embedding>> response = embeddingModel.embedAll(segments);
+
+            for (Embedding embedding : response.content()) {
+                allVectors.add(embedding.vector());
+            }
         }
-        
-        Response<List<Embedding>> response = embeddingModel.embedAll(segments);
-        
-        List<float[]> vectors = new ArrayList<>();
-        for (Embedding embedding : response.content()) {
-            vectors.add(embedding.vector());
-        }
-        
-        logger.info("[LangChain4j] 向量化完成: count={}", vectors.size());
-        return vectors;
+
+        logger.info("[LangChain4j] 向量化完成: count={}", allVectors.size());
+        return allVectors;
     }
 
     /**

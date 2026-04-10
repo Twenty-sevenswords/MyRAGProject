@@ -2,7 +2,7 @@ server:
   port: 8081 # 指定端口号
 spring:
   datasource:
-    url: jdbc:mysql://47.95.122.180:3306/PaiSmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://47.95.255.221:3306/PaiSmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   data:
     redis:
-      host: 47.95.122.180
+      host: 47.95.255.221
       port: 6379
       #password: PaiSmart2025
   servlet:
@@ -56,7 +56,7 @@ spring:
 
   kafka:
     enabled: true
-    bootstrap-servers: 47.95.122.180:9092
+    bootstrap-servers: 47.95.255.221:9092
     # 生产者核心配置：限制消息大小+超时（关键）
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -123,11 +123,11 @@ spring:
     max-in-memory-size: 16MB
 
 minio:
-  endpoint: http://47.95.122.180:9000
+  endpoint: http://47.95.255.221:9000
   accessKey: minio
   secretKey: minio123456
   bucketName: uploads
-  publicUrl: http://47.95.122.180:9090
+  publicUrl: http://47.95.255.221:9090
 
 jwt:
   secret-key: "PXrQbuCwXwOZzkML/Vm2S5rSwt1iybvmKtGDzVEu+Hc="
@@ -146,7 +146,7 @@ file:
     max-memory-threshold: 0.8  # 80% 内存阈值
 
 elasticsearch:
-  host: 47.95.122.180       # Elasticsearch主机地址
+  host: 47.95.255.221       # Elasticsearch主机地址
   port: 9200            # Elasticsearch端口号
   scheme: http         # 协议（http/https）
 #  username: elastic     # 安装后生成的默认用户
