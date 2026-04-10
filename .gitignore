@@ -2,7 +2,7 @@
 *.class
 
 # Log file
-*.log
+#*.log
 
 # BlueJ files
 *.ctxt
@@ -37,8 +37,8 @@ node_modules
 /.vscode
 
 # Logs
-logs
-*.log
+#logs
+#*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
