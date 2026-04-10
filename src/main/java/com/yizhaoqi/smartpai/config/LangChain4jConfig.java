@@ -75,12 +75,19 @@ public class LangChain4jConfig {
     // ===================== 修复：向量模型使用正确的地址和key =====================
     @Bean
     public EmbeddingModel embeddingModel() {
-        return OpenAiEmbeddingModel.builder()
+        OpenAiEmbeddingModel model= OpenAiEmbeddingModel.builder()
                 .baseUrl(embeddingApiUrl)    // ✅ 向量地址
                 .apiKey(embeddingApiKey)     // ✅ 向量key
                 .modelName(embeddingModel)
                 .dimensions(embeddingDimension)
                 .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
+        // 👇 这是添加的调试日志
+        org.slf4j.LoggerFactory.getLogger(LangChain4jConfig.class)
+                .info("Embedding模型配置 - URL: {}, Model: {}, Dimension: {}",
+                        embeddingApiUrl, embeddingModel, embeddingDimension);
+        return model;
+
+
     }
 }
