@@ -173,7 +173,7 @@ deepseek:
   api:
     url: https://dashscope.aliyuncs.com/compatible-mode/v1 # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
     model: qwen-turbo  # 本地: deepseek-r1:7b, 官方: deepseek-chat deepseek-ai/DeepSeek-R1
-    key: sk-c502ba1f6f034be9850462418960a7a4 # DeepSeek API Key 如果是本地就为空
+    key:  # DeepSeek API Key 如果是本地就为空
 #deepseek:
 #  api:
 #    url: https://api.siliconflow.cn/v1/chat/completions
@@ -184,7 +184,7 @@ embedding:
   api:
     url: https://dashscope.aliyuncs.com/compatible-mode/v1
     #    key: a3dcfc9c-6bd7-4121-8c08-75ae7ea0e94f   # 填入通义千问API key
-    key: sk-c502ba1f6f034be9850462418960a7a4
+    key:
     model: text-embedding-v4
     dimension: 2048  # 指定向量维度
 
