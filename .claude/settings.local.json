@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:access.redhat.com)",
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(mvn compile *)",
+      "WebFetch(domain:docs.langchain4j.dev)",
+      "Bash(mvn dependency:resolve -q)",
+      "WebFetch(domain:central.sonatype.com)",
+      "WebFetch(domain:mvnrepository.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(mvn dependency:resolve -Dartifact=dev.langchain4j:langchain4j-mcp:RELEASE)"
+    ]
+  }
+}

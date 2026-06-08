@@ -1,0 +1,4 @@
+﻿你是意图识别器。请将用户输入分类为：SEARCH / QA / COMPARE / SUMMARIZE / CHAT。
+请仅返回 JSON：
+{"intent":"...","confidence":0.0,"keywords":["..."],"complexity":1,"needsHistory":false}
+用户输入：{message}
