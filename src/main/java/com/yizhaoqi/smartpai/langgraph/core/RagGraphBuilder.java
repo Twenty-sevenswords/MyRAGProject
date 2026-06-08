@@ -11,145 +11,153 @@ import jakarta.annotation.PostConstruct;
 import java.util.Arrays;
 
 /**
- * RAG状态图构建器
- * 构建完整的RAG对话流程状态图
- * 
- * 图结构:
- *                    ┌──────────────────────────────────────┐
- *                    │                                      │
- *                    ▼                                      │
- *   START ──► memory ──► router ──► action ──► check ──► END
- *                │           │                          │
- *                │           │                          │
- *                ▼           └──────────────────────────┘
- *              (cache hit)              │
- *                  │                    │
- *                  ▼                    ▼
- *                 END               (retry)
- * 
- * 节点说明:
- * - memory:  检查历史问答缓存，命中则直接返回
- * - router:  意图识别，决定后续执行路径
- * - action:  RAG检索 + LLM生成
- * - check:   质量检查，不合格则降级
+ * Agentic RAG 状态图构建器
+ *
+ * 完整流水线（7节点）：
+ *
+ *   START
+ *     │
+ *     ▼
+ *   memory ──(命中缓存)──► END
+ *     │
+ *     ▼
+ *   queryAnalysis          ← 查询改写 + 意图判断
+ *     │
+ *     ▼
+ *   router                 ← 意图分类 + 路由决策
+ *     │
+ *     ▼
+ *   action                 ← 混合检索（KNN + BM25）
+ *     │
+ *     ▼
+ *   grading                ← 文档相关性评分过滤（CRAG思路）
+ *     │(sufficientContext=false)
+ *     ├──► action（重新检索，使用改写查询）
+ *     │
+ *     ▼
+ *   hallucinationCheck     ← 幻觉检测（Self-RAG思路）
+ *     │(failed, retryCount<2)
+ *     ├──► action（重试生成）
+ *     │
+ *     ▼
+ *   check                  ← 规则质检（长度/关键词/来源标注）
+ *     │
+ *     ▼
+ *   END
  */
 @Component
 public class RagGraphBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(RagGraphBuilder.class);
 
-    @Autowired
-    private MemoryNode memoryNode;
-
-    @Autowired
-    private RouterNode routerNode;
-
-    @Autowired
-    private ActionNode actionNode;
-
-    @Autowired
-    private CheckNode checkNode;
+    @Autowired private MemoryNode memoryNode;
+    @Autowired private QueryAnalysisNode queryAnalysisNode;
+    @Autowired private RouterNode routerNode;
+    @Autowired private ActionNode actionNode;
+    @Autowired private GradingNode gradingNode;
+    @Autowired private HallucinationCheckNode hallucinationCheckNode;
+    @Autowired private CheckNode checkNode;
 
     private StateGraph graph;
 
-    /**
-     * 构建状态图
-     */
     @PostConstruct
     public void build() {
-        logger.info("========== 构建RAG状态图 ==========");
+        logger.info("========== 构建 Agentic RAG 状态图 ==========");
 
-        graph = new StateGraph("RAGFlowGraph");
+        graph = new StateGraph("AgenticRAGGraph");
 
-        // 添加节点
-        graph.addNode("memory", memoryNode);
-        graph.addNode("router", routerNode);
-        graph.addNode("action", actionNode);
-        graph.addNode("check", checkNode);
+        // 注册节点
+        graph.addNode("memory",             memoryNode);
+        graph.addNode("queryAnalysis",      queryAnalysisNode);
+        graph.addNode("router",             routerNode);
+        graph.addNode("action",             actionNode);
+        graph.addNode("grading",            gradingNode);
+        graph.addNode("hallucinationCheck", hallucinationCheckNode);
+        graph.addNode("check",              checkNode);
 
-        // 设置入口节点
+        // 入口
         graph.setEntryPoint("memory");
 
-        // 添加条件路由: memory节点
-        graph.addConditionalEdges("memory", this::routeAfterMemory, 
-                Arrays.asList("router", "END"));
+        // memory → queryAnalysis | END（缓存命中）
+        graph.addConditionalEdges("memory", this::routeAfterMemory,
+                Arrays.asList("queryAnalysis", "END"));
 
-        // 添加条件路由: router节点
+        // queryAnalysis → router（固定）
+        graph.addEdge("queryAnalysis", "router");
+
+        // router → action | END
         graph.addConditionalEdges("router", this::routeAfterRouter,
                 Arrays.asList("action", "END"));
 
-        // 固定边: action -> check
-        graph.addEdge("action", "check");
+        // action → grading（固定）
+        graph.addEdge("action", "grading");
 
-        // 添加条件路由: check节点
+        // grading → hallucinationCheck | action（文档不足时重检索）
+        graph.addConditionalEdges("grading", this::routeAfterGrading,
+                Arrays.asList("hallucinationCheck", "action"));
+
+        // hallucinationCheck → check | action（幻觉时重生成）
+        graph.addConditionalEdges("hallucinationCheck", this::routeAfterHallucinationCheck,
+                Arrays.asList("check", "action"));
+
+        // check → END | action（规则不通过时重试）
         graph.addConditionalEdges("check", this::routeAfterCheck,
                 Arrays.asList("END", "action"));
 
-        // 标记结束节点
         graph.addEndNode("END");
 
-        logger.info("========== RAG状态图构建完成 ==========");
-        logger.info("图节点: {}", graph.getNodeNames());
+        logger.info("========== Agentic RAG 状态图构建完成，节点: {} ==========", graph.getNodeNames());
     }
 
-    /**
-     * memory节点后的路由决策
-     */
+    // ── 路由函数 ──────────────────────────────────────────────────────────────
+
     private String routeAfterMemory(AIState state) {
-        // 命中缓存，直接结束
         if (state.isCacheHit()) {
-            logger.info("[GraphRouter] 命中缓存，跳转到END");
+            logger.info("[Router] memory → END（缓存命中）");
             return "END";
         }
-        // 继续执行router
-        return "router";
+        return "queryAnalysis";
     }
 
-    /**
-     * router节点后的路由决策
-     */
     private String routeAfterRouter(AIState state) {
         String decision = state.getRouteDecision();
-        logger.info("[GraphRouter] router决策: {}", decision);
-        
-        switch (decision) {
-            case "action":
-                return "action";
-            case "fallback":
-                // 降级处理，目前仍然走action
-                return "action";
-            case "end":
-            default:
-                return "END";
-        }
+        logger.info("[Router] router决策: {}", decision);
+        return "end".equals(decision) ? "END" : "action";
     }
 
-    /**
-     * check节点后的路由决策
-     */
+    private String routeAfterGrading(AIState state) {
+        if (!state.isSufficientContext() && state.getRetryCount() < 1) {
+            state.setRetryCount(state.getRetryCount() + 1);
+            logger.info("[Router] grading → action（文档不足，触发重检索，第{}次）", state.getRetryCount());
+            return "action";
+        }
+        return "hallucinationCheck";
+    }
+
+    private String routeAfterHallucinationCheck(AIState state) {
+        if (!state.isHallucinationPassed() && state.getRetryCount() < 2) {
+            state.setRetryCount(state.getRetryCount() + 1);
+            logger.warn("[Router] hallucinationCheck → action（检测到幻觉，重新生成，第{}次）", state.getRetryCount());
+            return "action";
+        }
+        return "check";
+    }
+
     private String routeAfterCheck(AIState state) {
-        // 检查通过，结束
         if (state.isCheckPassed()) {
-            logger.info("[GraphRouter] 检查通过，跳转到END");
+            logger.info("[Router] check → END（质检通过）");
             return "END";
         }
-
-        // 检查未通过，判断是否需要重试
         if (state.isNeedsRetry() && state.getRetryCount() < 2) {
             state.setRetryCount(state.getRetryCount() + 1);
             state.setNeedsRetry(false);
-            logger.info("[GraphRouter] 重试次数: {}, 返回action重新执行", state.getRetryCount());
+            logger.info("[Router] check → action（质检未通过，重试第{}次）", state.getRetryCount());
             return "action";
         }
-
-        // 不重试，直接结束（使用降级回复）
-        logger.info("[GraphRouter] 检查未通过，跳转到END（降级回复）");
+        logger.warn("[Router] check → END（质检未通过，降级输出）");
         return "END";
     }
 
-    /**
-     * 获取构建好的图
-     */
     public StateGraph getGraph() {
         return graph;
     }

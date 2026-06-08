@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.config;
+package com.yizhaoqi.smartpai.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

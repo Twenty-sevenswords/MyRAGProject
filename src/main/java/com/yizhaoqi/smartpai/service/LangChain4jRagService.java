@@ -1,20 +1,23 @@
 package com.yizhaoqi.smartpai.service;
 
+import com.yizhaoqi.smartpai.dto.DocumentContent;
+import com.yizhaoqi.smartpai.dto.RagAnswer;
+import com.yizhaoqi.smartpai.util.PromptLoader;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.embedding.Embedding;
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
@@ -27,312 +30,188 @@ import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * LangChain4j RAG 服务
- * 提供完整的 RAG（检索增强生成）能力
+ * Central RAG service.
+ * - Keeps legacy embedding-store APIs.
+ * - Provides permission-aware generation for LangGraph nodes.
  */
 @Service
 public class LangChain4jRagService {
 
     private static final Logger logger = LoggerFactory.getLogger(LangChain4jRagService.class);
 
+    private static final String DEFAULT_SYSTEM_PROMPT = """
+            You are a reliable assistant.
+            Answer only based on the provided context.
+            If context is insufficient, explicitly say so.
+            """;
+
     private final ChatLanguageModel chatModel;
     private final StreamingChatLanguageModel streamingChatModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
-
-    // 默认系统提示
-    private static final String DEFAULT_SYSTEM_PROMPT = """
-            你是一个智能问答助手。请根据以下知识库内容回答用户问题。
-            
-            规则：
-            1. 只使用提供的知识库内容回答
-            2. 如果知识库中没有相关信息，请明确告知
-            3. 回答要准确、简洁、专业
-            4. 引用来源时标注文档名称
-            """;
+    private final HybridSearchService hybridSearchService;
+    private final PromptLoader promptLoader;
 
     public LangChain4jRagService(ChatLanguageModel chatModel,
-                                  StreamingChatLanguageModel streamingChatModel,
-                                  EmbeddingModel embeddingModel,
-                                  EmbeddingStore<TextSegment> embeddingStore) {
+                                 StreamingChatLanguageModel streamingChatModel,
+                                 EmbeddingModel embeddingModel,
+                                 EmbeddingStore<TextSegment> embeddingStore,
+                                 HybridSearchService hybridSearchService,
+                                 PromptLoader promptLoader) {
         this.chatModel = chatModel;
         this.streamingChatModel = streamingChatModel;
         this.embeddingModel = embeddingModel;
         this.embeddingStore = embeddingStore;
+        this.hybridSearchService = hybridSearchService;
+        this.promptLoader = promptLoader;
     }
 
-    // ========== 文档索引 ==========
+    // ---------- Legacy indexing/search on embedding store ----------
 
-    /**
-     * 索引单个文档
-     */
-    public void indexDocument(String content, String documentId, String fileName, 
-                              String userId, List<String> tags) {
-        logger.info("[LangChain4j RAG] 索引文档: id={}, file={}, length={}", 
-                documentId, fileName, content.length());
-        
-        // 创建元数据
+    public void indexDocument(String content, String documentId, String fileName, String userId, List<String> tags) {
         Metadata metadata = new Metadata();
         metadata.put("documentId", documentId);
         metadata.put("fileName", fileName);
         metadata.put("userId", userId);
         metadata.put("tags", tags != null ? String.join(",", tags) : "");
-        
-        // 创建文档
+
         Document document = Document.from(content, metadata);
-        
-        // 分割文档
         DocumentSplitter splitter = DocumentSplitters.recursive(500, 50);
         List<TextSegment> segments = splitter.split(document);
-        
-        // 批量嵌入并存储
+
         List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
         embeddingStore.addAll(embeddings, segments);
-        
-        logger.info("[LangChain4j RAG] 文档索引完成: segments={}", segments.size());
     }
 
-    /**
-     * 批量索引文档
-     */
     public void indexDocuments(List<DocumentContent> documents) {
-        logger.info("[LangChain4j RAG] 批量索引文档: count={}", documents.size());
-        
         List<TextSegment> allSegments = new ArrayList<>();
-        
         for (DocumentContent doc : documents) {
             Metadata metadata = new Metadata();
             metadata.put("documentId", doc.getDocumentId());
             metadata.put("fileName", doc.getFileName());
             metadata.put("userId", doc.getUserId());
             metadata.put("tags", doc.getTags() != null ? String.join(",", doc.getTags()) : "");
-            
+
             Document document = Document.from(doc.getContent(), metadata);
             DocumentSplitter splitter = DocumentSplitters.recursive(500, 50);
             allSegments.addAll(splitter.split(document));
         }
-        
-        // 批量嵌入并存储
+
         List<Embedding> embeddings = embeddingModel.embedAll(allSegments).content();
         embeddingStore.addAll(embeddings, allSegments);
-        
-        logger.info("[LangChain4j RAG] 批量索引完成: totalSegments={}", allSegments.size());
     }
 
-    // ========== 检索 ==========
-
-    /**
-     * 相似度检索
-     */
-    public List<SearchResult> search(String query, int maxResults) {
-        logger.debug("[LangChain4j RAG] 检索: query={}, maxResults={}", query, maxResults);
-        
-        // 嵌入查询
+    public List<EmbeddingSearchResultDto> search(String query, int maxResults) {
         Embedding queryEmbedding = embeddingModel.embed(query).content();
-        
-        // 搜索
         EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
                 .maxResults(maxResults)
                 .minScore(0.5)
                 .build();
-        
+
         EmbeddingSearchResult<TextSegment> searchResult = embeddingStore.search(searchRequest);
-        
-        // 转换结果
         return searchResult.matches().stream()
-                .map(this::toSearchResult)
+                .map(this::toEmbeddingSearchResult)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 带权限过滤的检索
-     */
-    public List<SearchResult> searchWithPermission(String query, String userId,
-                                                    int maxResults) {
-        logger.debug("[LangChain4j RAG] 带权限检索: query={}, userId={}", query, userId);
-        
-        // 嵌入查询
+    public List<EmbeddingSearchResultDto> searchWithPermission(String query, String userId, int maxResults) {
         Embedding queryEmbedding = embeddingModel.embed(query).content();
-        
-        // 搜索（不带过滤，在结果中手动过滤）
         EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
-                .maxResults(maxResults * 2)  // 多取一些，后续过滤
+                .maxResults(maxResults * 2)
                 .minScore(0.5)
                 .build();
-        
+
         EmbeddingSearchResult<TextSegment> searchResult = embeddingStore.search(searchRequest);
-        
-        // 手动过滤权限
         return searchResult.matches().stream()
-                .filter(match -> {
-                    // 检查用户权限
-                    Metadata metadata = match.embedded().metadata();
-                    String docUserId = metadata.getString("userId");
-                    String tags = metadata.getString("tags");
-                    
-                    // 权限过滤逻辑：
-                    // 1. 如果文档没有设置 userId（公开文档），允许访问
-                    // 2. 如果用户是文档所有者，允许访问
-                    // 3. 如果文档有标签，检查用户是否有对应权限
-                    if (docUserId == null || docUserId.isEmpty()) {
-                        // 公开文档，允许访问
-                        return true;
-                    }
-                    
-                    if (userId != null && userId.equals(docUserId)) {
-                        // 用户是文档所有者，允许访问
-                        return true;
-                    }
-                    
-                    // 检查标签权限（如果用户有对应标签权限则允许访问）
-                    if (tags != null && !tags.isEmpty() && userId != null) {
-                        // 这里可以扩展为检查用户是否有对应标签的访问权限
-                        // 目前简化处理：有标签的文档允许所有登录用户访问
-                        return true;
-                    }
-                    
-                    // 默认拒绝访问
-                    logger.debug("[LangChain4j RAG] 权限过滤拒绝访问: docUserId={}, requestUserId={}",
-                            docUserId, userId);
-                    return false;
-                })
+                .filter(match -> hasPermission(match, userId))
                 .limit(maxResults)
-                .map(this::toSearchResult)
+                .map(this::toEmbeddingSearchResult)
                 .collect(Collectors.toList());
     }
 
-    private SearchResult toSearchResult(EmbeddingMatch<TextSegment> match) {
-        SearchResult result = new SearchResult();
-        result.setContent(match.embedded().text());
-        result.setScore(match.score());
-        
-        Metadata metadata = match.embedded().metadata();
-        result.setDocumentId(metadata.getString("documentId"));
-        result.setFileName(metadata.getString("fileName"));
-        
-        return result;
-    }
-
-    // ========== RAG 生成 ==========
-
-    /**
-     * RAG 问答（同步）
-     */
     public String ask(String question, int maxResults) {
-        // 1. 检索相关内容
-        List<SearchResult> searchResults = search(question, maxResults);
-        
+        List<EmbeddingSearchResultDto> searchResults = search(question, maxResults);
         if (searchResults.isEmpty()) {
-            return "抱歉，我在知识库中没有找到相关信息。";
+            return "No relevant information found in the knowledge base.";
         }
-        
-        // 2. 构建上下文
-        String context = buildContext(searchResults);
-        
-        // 3. 生成回答
-        String prompt = buildPrompt(context, question);
-        return chatModel.generate(prompt);
+        String context = buildEmbeddingContext(searchResults);
+        return chatModel.chat(buildPrompt(context, question));
     }
 
-    /**
-     * RAG 问答（带系统提示，同步）
-     */
     public String ask(String systemPrompt, String question, int maxResults) {
-        // 1. 检索相关内容
-        List<SearchResult> searchResults = search(question, maxResults);
-        
+        List<EmbeddingSearchResultDto> searchResults = search(question, maxResults);
         if (searchResults.isEmpty()) {
-            return "抱歉，我在知识库中没有找到相关信息。";
+            return "No relevant information found in the knowledge base.";
         }
-        
-        // 2. 构建上下文
-        String context = buildContext(searchResults);
-        
-        // 3. 生成回答
+
+        String context = buildEmbeddingContext(searchResults);
         List<ChatMessage> messages = new ArrayList<>();
-        messages.add(SystemMessage.from(systemPrompt != null ? systemPrompt : DEFAULT_SYSTEM_PROMPT));
+        messages.add(SystemMessage.from(systemPrompt != null ? systemPrompt : getSystemPrompt()));
         messages.add(UserMessage.from(buildPrompt(context, question)));
-        
-        Response<AiMessage> response = chatModel.generate(messages);
-        return response.content().text();
+        ChatResponse response = chatModel.chat(ChatRequest.builder().messages(messages).build());
+        return response.aiMessage().text();
     }
 
-    /**
-     * RAG 问答（流式）
-     */
-    public void askStream(String question, int maxResults, 
-                          Consumer<String> onChunk, Consumer<Throwable> onError) {
-        // 1. 检索相关内容
-        List<SearchResult> searchResults = search(question, maxResults);
-        
+    public void askStream(String question, int maxResults, Consumer<String> onChunk, Consumer<Throwable> onError) {
+        List<EmbeddingSearchResultDto> searchResults = search(question, maxResults);
         if (searchResults.isEmpty()) {
-            onChunk.accept("抱歉，我在知识库中没有找到相关信息。");
+            onChunk.accept("No relevant information found in the knowledge base.");
             return;
         }
-        
-        // 2. 构建上下文
-        String context = buildContext(searchResults);
-        
-        // 3. 流式生成回答
-        String prompt = buildPrompt(context, question);
-        
-        streamingChatModel.generate(prompt, new StreamingResponseHandler<AiMessage>() {
+
+        String context = buildEmbeddingContext(searchResults);
+        List<ChatMessage> messages = new ArrayList<>();
+        messages.add(SystemMessage.from(getSystemPrompt()));
+        messages.add(UserMessage.from(buildPrompt(context, question)));
+
+        ChatRequest request = ChatRequest.builder().messages(messages).build();
+        streamingChatModel.chat(request, new StreamingChatResponseHandler() {
             @Override
-            public void onNext(String token) {
-                onChunk.accept(token);
+            public void onPartialResponse(String partialResponse) {
+                onChunk.accept(partialResponse);
             }
 
             @Override
-            public void onComplete(Response<AiMessage> response) {
-                logger.debug("[LangChain4j RAG] 流式生成完成");
+            public void onCompleteResponse(ChatResponse completeResponse) {
+                logger.debug("[LangChain4jRagService] stream completed");
             }
 
             @Override
             public void onError(Throwable error) {
-                logger.error("[LangChain4j RAG] 流式生成错误", error);
                 onError.accept(error);
             }
         });
     }
 
-    /**
-     * RAG 问答（流式，返回 Flux）
-     */
     public Flux<String> askStreamFlux(String question, int maxResults) {
         Sinks.Many<String> sink = Sinks.many().unicast().onBackpressureBuffer();
-        
-        // 1. 检索相关内容
-        List<SearchResult> searchResults = search(question, maxResults);
-        
+        List<EmbeddingSearchResultDto> searchResults = search(question, maxResults);
         if (searchResults.isEmpty()) {
-            sink.tryEmitNext("抱歉，我在知识库中没有找到相关信息。");
+            sink.tryEmitNext("No relevant information found in the knowledge base.");
             sink.tryEmitComplete();
             return sink.asFlux();
         }
-        
-        // 2. 构建上下文
-        String context = buildContext(searchResults);
-        
-        // 3. 流式生成回答
+
+        String context = buildEmbeddingContext(searchResults);
         List<ChatMessage> messages = new ArrayList<>();
-        messages.add(SystemMessage.from(DEFAULT_SYSTEM_PROMPT));
+        messages.add(SystemMessage.from(getSystemPrompt()));
         messages.add(UserMessage.from(buildPrompt(context, question)));
-        
-        streamingChatModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
+
+        ChatRequest request = ChatRequest.builder().messages(messages).build();
+        streamingChatModel.chat(request, new StreamingChatResponseHandler() {
             @Override
-            public void onNext(String token) {
-                sink.tryEmitNext(token);
+            public void onPartialResponse(String partialResponse) {
+                sink.tryEmitNext(partialResponse);
             }
 
             @Override
-            public void onComplete(Response<AiMessage> response) {
+            public void onCompleteResponse(ChatResponse completeResponse) {
                 sink.tryEmitComplete();
             }
 
@@ -341,71 +220,130 @@ public class LangChain4jRagService {
                 sink.tryEmitError(error);
             }
         });
-        
         return sink.asFlux();
     }
 
-    // ========== 辅助方法 ==========
+    // ---------- LangGraph-facing APIs (permission-aware) ----------
 
-    private String buildContext(List<SearchResult> results) {
-        StringBuilder context = new StringBuilder();
-        context.append("【知识库内容】\n");
-        
-        for (int i = 0; i < results.size(); i++) {
-            SearchResult r = results.get(i);
-            context.append(String.format("[%d] %s\n来源：%s\n\n", 
-                    i + 1, r.getContent(), r.getFileName()));
+    public RagAnswer askWithPermission(String question, String userId, int topK) {
+        List<com.yizhaoqi.smartpai.dto.SearchResult> results =
+                hybridSearchService.searchWithPermission(question, userId, topK);
+
+        if (results == null || results.isEmpty()) {
+            return new RagAnswer("No relevant information found in the knowledge base.", new ArrayList<>(), false);
         }
-        
+
+        String prompt = buildPrompt(buildHybridContext(results), question);
+        String reply = chatModel.chat(prompt);
+        return new RagAnswer(reply, results, true);
+    }
+
+    public String ask(String question, String userId) {
+        return askWithPermission(question, userId, 8).getReply();
+    }
+
+    // ---------- Helpers ----------
+
+    private boolean hasPermission(EmbeddingMatch<TextSegment> match, String userId) {
+        Metadata metadata = match.embedded().metadata();
+        String docUserId = metadata.getString("userId");
+        if (docUserId == null || docUserId.isEmpty()) {
+            return true;
+        }
+        if (userId != null && userId.equals(docUserId)) {
+            return true;
+        }
+        String tags = metadata.getString("tags");
+        return tags != null && !tags.isEmpty() && userId != null;
+    }
+
+    private EmbeddingSearchResultDto toEmbeddingSearchResult(EmbeddingMatch<TextSegment> match) {
+        EmbeddingSearchResultDto result = new EmbeddingSearchResultDto();
+        result.setContent(match.embedded().text());
+        result.setScore(match.score());
+
+        Metadata metadata = match.embedded().metadata();
+        result.setDocumentId(metadata.getString("documentId"));
+        result.setFileName(metadata.getString("fileName"));
+        return result;
+    }
+
+    private String buildEmbeddingContext(List<EmbeddingSearchResultDto> results) {
+        StringBuilder context = new StringBuilder();
+        context.append("Knowledge snippets:\n");
+
+        for (int i = 0; i < results.size(); i++) {
+            EmbeddingSearchResultDto r = results.get(i);
+            context.append("[").append(i + 1).append("] ")
+                    .append(r.getContent())
+                    .append("\nSource: ")
+                    .append(r.getFileName())
+                    .append("\n\n");
+        }
+        return context.toString();
+    }
+
+    private String buildHybridContext(List<com.yizhaoqi.smartpai.dto.SearchResult> results) {
+        StringBuilder context = new StringBuilder();
+        context.append("Knowledge snippets:\n");
+
+        for (int i = 0; i < Math.min(5, results.size()); i++) {
+            com.yizhaoqi.smartpai.dto.SearchResult r = results.get(i);
+            String fileName = r.getFileName() != null ? r.getFileName() : r.getFileMd5();
+            context.append("[").append(i + 1).append("] ")
+                    .append(r.getTextContent() == null ? "" : r.getTextContent())
+                    .append("\nSource: ").append(fileName)
+                    .append("\n\n");
+        }
         return context.toString();
     }
 
     private String buildPrompt(String context, String question) {
-        return String.format("%s\n\n用户问题：%s", context, question);
+        return context + "\nQuestion: " + question;
     }
 
-    // ========== 内部类 ==========
-
-    /**
-     * 文档内容
-     */
-    public static class DocumentContent {
-        private String documentId;
-        private String fileName;
-        private String content;
-        private String userId;
-        private List<String> tags;
-
-        // Getters and Setters
-        public String getDocumentId() { return documentId; }
-        public void setDocumentId(String documentId) { this.documentId = documentId; }
-        public String getFileName() { return fileName; }
-        public void setFileName(String fileName) { this.fileName = fileName; }
-        public String getContent() { return content; }
-        public void setContent(String content) { this.content = content; }
-        public String getUserId() { return userId; }
-        public void setUserId(String userId) { this.userId = userId; }
-        public List<String> getTags() { return tags; }
-        public void setTags(List<String> tags) { this.tags = tags; }
+    private String getSystemPrompt() {
+        return promptLoader.loadWithFallback("prompts/system-rag.txt", DEFAULT_SYSTEM_PROMPT);
     }
 
-    /**
-     * 搜索结果
-     */
-    public static class SearchResult {
+    // ---------- Legacy DTO (renamed from SearchResult) ----------
+
+    public static class EmbeddingSearchResultDto {
         private String content;
         private double score;
         private String documentId;
         private String fileName;
 
-        // Getters and Setters
-        public String getContent() { return content; }
-        public void setContent(String content) { this.content = content; }
-        public double getScore() { return score; }
-        public void setScore(double score) { this.score = score; }
-        public String getDocumentId() { return documentId; }
-        public void setDocumentId(String documentId) { this.documentId = documentId; }
-        public String getFileName() { return fileName; }
-        public void setFileName(String fileName) { this.fileName = fileName; }
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public double getScore() {
+            return score;
+        }
+
+        public void setScore(double score) {
+            this.score = score;
+        }
+
+        public String getDocumentId() {
+            return documentId;
+        }
+
+        public void setDocumentId(String documentId) {
+            this.documentId = documentId;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
     }
 }

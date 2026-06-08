@@ -1,6 +1,7 @@
 package com.yizhaoqi.smartpai.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yizhaoqi.smartpai.config.interceptor.LoggingInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

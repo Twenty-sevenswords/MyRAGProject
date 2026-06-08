@@ -2,6 +2,7 @@ package com.yizhaoqi.smartpai.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yizhaoqi.smartpai.exception.CustomException;
 import com.yizhaoqi.smartpai.model.OrganizationTag;
@@ -430,6 +431,7 @@ public class AdminController {
             LogUtils.logBusiness("ADMIN_GET_ALL_CONVERSATIONS", adminUsername, "管理员开始查询对话历史，目标用户ID: %s, 时间范围: %s 到 %s", userid, start_date, end_date);
             
             List<Map<String, Object>> allConversations = new ArrayList<>();
+            Set<String> seenMessages = new HashSet<>();
             
             // 如果指定了userid，先验证用户是否存在
             String targetUsername = null;
@@ -475,11 +477,13 @@ public class AdminController {
                         String json = redisTemplate.opsForValue().get(conversationKey);
                         if (json != null) {
                             String displayUsername = targetUsername != null ? targetUsername : redisUserId;
-                            processRedisConversation(json, allConversations, displayUsername, start_date, end_date);
+                            processRedisConversation(json, allConversations, seenMessages, displayUsername, start_date, end_date);
                         }
                     }
                 }
             }
+
+            processChatContextConversations(allConversations, seenMessages, userid, targetUsername, start_date, end_date);
             
             LogUtils.logBusiness("ADMIN_GET_ALL_CONVERSATIONS", adminUsername, "管理员查询完成，共获取到 %d 条对话记录", allConversations.size());
             LogUtils.logUserOperation(adminUsername, "ADMIN_GET_ALL_CONVERSATIONS", "conversation_history", "SUCCESS");
@@ -506,7 +510,7 @@ public class AdminController {
     /**
      * 处理Redis中的对话数据
      */
-    private void processRedisConversation(String json, List<Map<String, Object>> targetList, String username, String startDate, String endDate) throws JsonProcessingException {
+    private void processRedisConversation(String json, List<Map<String, Object>> targetList, Set<String> seenMessages, String username, String startDate, String endDate) throws JsonProcessingException {
         List<Map<String, String>> history = objectMapper.readValue(json, 
                 new TypeReference<List<Map<String, String>>>() {});
         
@@ -516,7 +520,7 @@ public class AdminController {
         
         if (startDate != null && !startDate.trim().isEmpty()) {
             try {
-                startDateTime = parseDateTime(startDate);
+                startDateTime = parseDateTime(startDate, false);
             } catch (Exception e) {
                 LogUtils.logBusinessError("ADMIN_GET_ALL_CONVERSATIONS", username, "起始时间解析失败: %s", e, startDate);
             }
@@ -524,7 +528,7 @@ public class AdminController {
         
         if (endDate != null && !endDate.trim().isEmpty()) {
             try {
-                endDateTime = parseDateTime(endDate);
+                endDateTime = parseDateTime(endDate, true);
             } catch (Exception e) {
                 LogUtils.logBusinessError("ADMIN_GET_ALL_CONVERSATIONS", username, "结束时间解析失败: %s", e, endDate);
             }
@@ -532,48 +536,162 @@ public class AdminController {
         
         // 将对话转换为前端需要的格式，使用存储的时间戳并添加用户名
         for (Map<String, String> message : history) {
-            String messageTimestamp = message.getOrDefault("timestamp", "未知时间");
-            
-            // 时间过滤
-            if (startDateTime != null || endDateTime != null) {
-                if (!"未知时间".equals(messageTimestamp)) {
-                    try {
-                        java.time.LocalDateTime messageDateTime = java.time.LocalDateTime.parse(messageTimestamp, 
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-                        
-                        // 检查是否在时间范围内
-                        if (startDateTime != null && messageDateTime.isBefore(startDateTime)) {
-                            continue; // 跳过早于起始时间的消息
-                        }
-                        if (endDateTime != null && messageDateTime.isAfter(endDateTime)) {
-                            continue; // 跳过晚于结束时间的消息
-                        }
-                    } catch (Exception e) {
-                        // 时间戳格式不正确，跳过过滤（包含所有消息）
-                        LogUtils.logBusinessError("ADMIN_GET_ALL_CONVERSATIONS", username, "消息时间戳格式错误: %s", e, messageTimestamp);
-                    }
-                }
-                // 如果是"未知时间"且设置了时间过滤，跳过该消息
-                else if (startDateTime != null || endDateTime != null) {
+            addConversationMessage(
+                    targetList,
+                    seenMessages,
+                    username,
+                    message.get("role"),
+                    message.get("content"),
+                    message.getOrDefault("timestamp", "未知时间"),
+                    startDateTime,
+                    endDateTime
+            );
+        }
+    }
+
+    /**
+     * 兼容新版聊天上下文格式：chat:context:session:{sessionId}
+     */
+    private void processChatContextConversations(List<Map<String, Object>> targetList,
+                                                 Set<String> seenMessages,
+                                                 String requestedUserId,
+                                                 String targetUsername,
+                                                 String startDate,
+                                                 String endDate) {
+        Set<String> contextKeys = redisTemplate.keys("chat:context:session:*");
+        if (contextKeys == null || contextKeys.isEmpty()) {
+            return;
+        }
+
+        java.time.LocalDateTime startDateTime = null;
+        java.time.LocalDateTime endDateTime = null;
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            startDateTime = parseDateTime(startDate, false);
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            endDateTime = parseDateTime(endDate, true);
+        }
+
+        for (String contextKey : contextKeys) {
+            try {
+                String json = redisTemplate.opsForValue().get(contextKey);
+                if (json == null || json.isBlank()) {
                     continue;
                 }
+
+                JsonNode root = objectMapper.readTree(json);
+                String contextUserId = root.path("userId").asText("");
+                if (!shouldIncludeUser(contextUserId, requestedUserId, targetUsername)) {
+                    continue;
+                }
+
+                String displayUsername = targetUsername != null ? targetUsername : resolveDisplayUsername(contextUserId);
+                JsonNode messages = root.path("messages");
+                if (!messages.isArray()) {
+                    continue;
+                }
+
+                for (JsonNode message : messages) {
+                    addConversationMessage(
+                            targetList,
+                            seenMessages,
+                            displayUsername,
+                            message.path("role").asText(null),
+                            message.path("content").asText(null),
+                            message.path("timestamp").asText("未知时间"),
+                            startDateTime,
+                            endDateTime
+                    );
+                }
+            } catch (Exception e) {
+                LogUtils.logBusinessError("ADMIN_GET_ALL_CONVERSATIONS", "system", "读取聊天上下文失败: %s", e, contextKey);
             }
-            
-            Map<String, Object> messageWithMetadata = new HashMap<>();
-            messageWithMetadata.put("role", message.get("role"));
-            messageWithMetadata.put("content", message.get("content"));
-            messageWithMetadata.put("timestamp", messageTimestamp);
-            messageWithMetadata.put("username", username);
-            targetList.add(messageWithMetadata);
         }
+    }
+
+    private boolean shouldIncludeUser(String actualUserId, String requestedUserId, String targetUsername) {
+        if (requestedUserId == null || requestedUserId.isBlank()) {
+            return true;
+        }
+        return requestedUserId.equals(actualUserId) || (targetUsername != null && targetUsername.equals(actualUserId));
+    }
+
+    private String resolveDisplayUsername(String rawUserId) {
+        if (rawUserId == null || rawUserId.isBlank()) {
+            return "unknown";
+        }
+        try {
+            Long id = Long.parseLong(rawUserId);
+            return userRepository.findById(id).map(User::getUsername).orElse(rawUserId);
+        } catch (NumberFormatException ignored) {
+            return rawUserId;
+        }
+    }
+
+    private void addConversationMessage(List<Map<String, Object>> targetList,
+                                        Set<String> seenMessages,
+                                        String username,
+                                        String role,
+                                        String content,
+                                        String timestamp,
+                                        java.time.LocalDateTime startDateTime,
+                                        java.time.LocalDateTime endDateTime) {
+        if (role == null || content == null || content.isBlank()) {
+            return;
+        }
+
+        username = username != null ? username : "unknown";
+        timestamp = timestamp != null ? timestamp : "未知时间";
+
+        if ((startDateTime != null || endDateTime != null) && "未知时间".equals(timestamp)) {
+            return;
+        }
+
+        if (startDateTime != null || endDateTime != null) {
+            try {
+                java.time.LocalDateTime messageDateTime = parseDateTime(timestamp, false);
+                if (startDateTime != null && messageDateTime.isBefore(startDateTime)) {
+                    return;
+                }
+                if (endDateTime != null && messageDateTime.isAfter(endDateTime)) {
+                    return;
+                }
+            } catch (Exception e) {
+                LogUtils.logBusinessError("ADMIN_GET_ALL_CONVERSATIONS", username, "消息时间戳格式错误: %s", e, timestamp);
+                return;
+            }
+        }
+
+        String dedupeKey = String.join("|", username, timestamp, role, content);
+        if (seenMessages != null && !seenMessages.add(dedupeKey)) {
+            return;
+        }
+
+        Map<String, Object> messageWithMetadata = new HashMap<>();
+        messageWithMetadata.put("role", role);
+        messageWithMetadata.put("content", content);
+        messageWithMetadata.put("timestamp", timestamp);
+        messageWithMetadata.put("username", username);
+        targetList.add(messageWithMetadata);
     }
     
     /**
      * 解析日期时间字符串，支持多种格式
      */
     private java.time.LocalDateTime parseDateTime(String dateTimeStr) {
+        return parseDateTime(dateTimeStr, false);
+    }
+
+    private java.time.LocalDateTime parseDateTime(String dateTimeStr, boolean endOfDay) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return null;
+        }
+
+        dateTimeStr = dateTimeStr.trim();
+
+        if (dateTimeStr.length() == 10) {
+            java.time.LocalDate date = java.time.LocalDate.parse(dateTimeStr);
+            return endOfDay ? date.atTime(java.time.LocalTime.MAX) : date.atStartOfDay();
         }
         
         try {
@@ -589,11 +707,6 @@ public class AdminController {
                 // 尝试解析不带分钟和秒的格式 (2023-01-01T12)
                 if (dateTimeStr.length() == 13) {
                     return java.time.LocalDateTime.parse(dateTimeStr + ":00:00");
-                }
-                
-                // 尝试解析日期格式 (2023-01-01)
-                if (dateTimeStr.length() == 10) {
-                    return java.time.LocalDateTime.parse(dateTimeStr + "T00:00:00");
                 }
                 
                 // 如果以上都失败，尝试使用自定义格式解析

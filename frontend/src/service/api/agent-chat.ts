@@ -1,6 +1,7 @@
 // frontend/src/service/api/agent-chat.ts
 import { useWebSocket } from '@vueuse/core'
 import { ref, watch } from 'vue'
+import { buildWebSocketURL } from '@/utils/service'
 
 // Agent事件类型
 export interface AgentEvent {
@@ -25,7 +26,7 @@ export function useAgentChat() {
   let ws: WebSocket | null = null
 
   const connect = (sessionId: string, userId: string) => {
-    const wsUrl = `ws://localhost:8081/ws/agent-chat?sessionId=${sessionId}&userId=${userId}`
+    const wsUrl = buildWebSocketURL('/ws/agent-chat', { sessionId, userId })
 
     ws = new WebSocket(wsUrl)
 
@@ -34,20 +35,20 @@ export function useAgentChat() {
       events.value.push(data)
 
       // 更新Agent状态
-      if (data.type === 'AGENT_START') {
+      if (data.type === 'start') {
         currentStatus.value[data.agent] = {
           state: 'running',
           message: data.message,
           startTime: data.timestamp
         }
-      } else if (data.type === 'AGENT_COMPLETE') {
+      } else if (data.type === 'complete') {
         const agent = currentStatus.value[data.agent]
         if (agent) {
           agent.state = 'success'
           agent.message = data.message
           agent.endTime = data.timestamp
         }
-      } else if (data.type === 'ERROR') {
+      } else if (data.type === 'error') {
         currentStatus.value[data.agent] = {
           state: 'error',
           message: data.message

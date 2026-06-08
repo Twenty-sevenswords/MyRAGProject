@@ -1,7 +1,7 @@
 package com.yizhaoqi.smartpai.controller;
 
-import com.yizhaoqi.smartpai.entity.ChatContext;
-import com.yizhaoqi.smartpai.entity.ChatMessage;
+import com.yizhaoqi.smartpai.dto.ChatContext;
+import com.yizhaoqi.smartpai.dto.ChatMessage;
 import com.yizhaoqi.smartpai.handler.ChatWebSocketHandler;
 import com.yizhaoqi.smartpai.service.ChatContextService;
 import com.yizhaoqi.smartpai.service.ChatHandler;

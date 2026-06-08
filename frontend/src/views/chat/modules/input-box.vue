@@ -22,9 +22,13 @@ const currentWsStatus = computed(() => {
   return chatMode.value === 'agent' ? agentWsStatus.value : wsStatus.value;
 });
 
-const sendable = computed(
-  () => (!input.value.message && !isSending) || ['CLOSED', 'CONNECTING'].includes(currentWsStatus.value)
-);
+const normalizedMessage = computed(() => input.value.message.trim());
+
+const sendDisabled = computed(() => {
+  if (isSending.value) return false;
+
+  return !normalizedMessage.value || ['CLOSED', 'CONNECTING'].includes(currentWsStatus.value);
+});
 
 // 普通模式WebSocket消息处理
 watch(wsData, val => {
@@ -53,7 +57,6 @@ watch(agentEvents, (events) => {
   if (lastEvent.type === 'start') {
     if (assistant?.role === 'assistant') {
       assistant.status = 'loading';
-      assistant.content = `🔄 ${lastEvent.agent}: ${lastEvent.message}...`;
     }
   } else if (lastEvent.type === 'stream') {
     // 流式数据已经在 store 中处理，这里不需要重复处理
@@ -85,19 +88,23 @@ const handleSend = async () => {
     return;
   }
 
+  const message = normalizedMessage.value;
+  if (!message) return;
+
   list.value.push({
-    content: input.value.message,
+    content: message,
     role: 'user'
   });
-  
-  // 使用统一的sendMessage方法
-  chatStore.sendMessage(input.value.message);
-  
+
   list.value.push({
     content: chatMode.value === 'agent' ? '🔄 Agent协作处理中...' : '',
     role: 'assistant',
     status: 'pending'
   });
+
+  // 使用统一的sendMessage方法
+  chatStore.sendMessage(message);
+
   input.value.message = '';
 };
 
@@ -154,7 +161,7 @@ const handShortcut = (e: KeyboardEvent) => {
     <textarea
       ref="inputRef"
       v-model.trim="input.message"
-      :placeholder="chatMode === 'agent' ? '给 Agent协作助手 发送消息' : '给 派聪明 发送消息'"
+      :placeholder="chatMode === 'agent' ? '给 Agent协作助手 发送消息' : '给 杨志博毕设 发送消息'"
       class="min-h-10 w-full cursor-text resize-none b-none bg-transparent color-#333 caret-[rgb(var(--primary-color))] outline-none dark:color-#f1f1f1"
       @keydown="handShortcut"
     />
@@ -169,7 +176,7 @@ const handShortcut = (e: KeyboardEvent) => {
           Agent模式
         </n-tag>
       </div>
-      <NButton :disabled="sendable" strong circle type="primary" @click="handleSend">
+      <NButton :disabled="sendDisabled" strong circle type="primary" @click="handleSend">
         <template #icon>
           <icon-material-symbols:stop-rounded v-if="isSending" />
           <icon-guidance:send v-else />

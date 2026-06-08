@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.config;
+package com.yizhaoqi.smartpai.config.filter;
 
 import com.yizhaoqi.smartpai.model.FileUpload;
 import com.yizhaoqi.smartpai.repository.FileUploadRepository;

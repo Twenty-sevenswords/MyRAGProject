@@ -1,6 +1,6 @@
 package com.yizhaoqi.smartpai.mcp.router.impl;
 
-import com.yizhaoqi.smartpai.config.RouterProperties;
+import com.yizhaoqi.smartpai.config.properties.RouterProperties;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.router.PreRouter;
 import com.yizhaoqi.smartpai.mcp.router.RouteResult;

@@ -2,7 +2,7 @@ server:
   port: 8081 # 指定端口号
 spring:
   datasource:
-    url: jdbc:mysql://47.95.255.221:3306/PaiSmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://120.26.181.60:3306/paismart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   data:
     redis:
-      host: 47.95.255.221
+      host: 120.26.181.60
       port: 6379
       #password: PaiSmart2025
   servlet:
@@ -56,7 +56,7 @@ spring:
 
   kafka:
     enabled: true
-    bootstrap-servers: 47.95.255.221:9092
+    bootstrap-servers: 120.26.181.60:9092
     # 生产者核心配置：限制消息大小+超时（关键）
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -111,6 +111,12 @@ spring:
     topic:
       file-processing: file-processing-topic1
       dlt: file-processing-dlt
+      # Multi-Agent 任务事件总线
+      agent-vector-retrieval: agent.vector.retrieval
+      agent-keyword-retrieval: agent.keyword.retrieval
+      agent-retrieval-results: agent.retrieval.results
+      agent-reflection-tasks: agent.reflection.tasks
+      agent-summary-tasks: agent.summary.tasks
 
   # 补充：全局超时配置，防止WebFlux/Kafka等组件阻塞
 
@@ -123,11 +129,11 @@ spring:
     max-in-memory-size: 16MB
 
 minio:
-  endpoint: http://47.95.255.221:9000
+  endpoint: http://120.26.181.60:9000
   accessKey: minio
   secretKey: minio123456
   bucketName: uploads
-  publicUrl: http://47.95.255.221:9090
+  publicUrl: http://120.26.181.60:9090
 
 jwt:
   secret-key: "PXrQbuCwXwOZzkML/Vm2S5rSwt1iybvmKtGDzVEu+Hc="
@@ -135,7 +141,7 @@ jwt:
 # 管理员账号初始化配置
 admin:
   username: admin
-  password: admin123
+  password: admin1234
   primary-org: default
   org-tags: default,admin
 
@@ -146,47 +152,98 @@ file:
     max-memory-threshold: 0.8  # 80% 内存阈值
 
 elasticsearch:
-  host: 47.95.255.221       # Elasticsearch主机地址
+  host: 120.26.181.60      # Elasticsearch主机地址
   port: 9200            # Elasticsearch端口号
   scheme: http         # 协议（http/https）
+
+# ========== Actuator / Prometheus 可观测性 ==========
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    tags:
+      application: smartpai
 #  username: elastic     # 安装后生成的默认用户
 #  password: fZZh4IzlA6*U1afm68W0
 
 
+#logging:
+#  level:
+#    org.springframework.web: DEBUG
+#    org.springframework.boot.autoconfigure.web.servlet: DEBUG
+#    org.springframework.security: DEBUG
+#    com.yizhaoqi.smartpai.service: DEBUG
+##    com.yizhaoqi.smartpai.service.agent: DEBUG
+#    io.minio: DEBUG
+# ====================== 生产环境日志配置（直接复制） ======================
 logging:
+  # 日志输出文件路径（自动按天切割）
+  file:
+    name: ./logs/smartpai.log
+  logback:
+    rollingpolicy:
+      # 日志归档规则：每天生成一个新文件
+      file-name-pattern: ./logs/smartpai-%d{yyyy-MM-dd}.log
+      # 最多保留 30 天日志
+      max-history: 30
+      # 总日志大小上限 5GB
+      total-size-cap: 3GB
+      # 单个日志文件最大 100MB
+      max-file-size: 100MB
+  # 生产环境日志级别（关闭多余 DEBUG，只留重要信息）
   level:
-    org.springframework.web: DEBUG
-    org.springframework.boot.autoconfigure.web.servlet: DEBUG
-    org.springframework.security: DEBUG
-    com.yizhaoqi.smartpai.service: DEBUG
-#    com.yizhaoqi.smartpai.service.agent: DEBUG
-    io.minio: DEBUG
+    root: INFO                     # 全局默认 INFO
+    org.springframework: WARN      # 框架警告级别
+    org.springframework.security: WARN
+    com.yizhaoqi.smartpai: INFO    # 你的项目代码 INFO
+    io.minio: WARN                 # MinIO 关闭调试
+    org.hibernate: WARN            # 数据库关闭 SQL 打印
+    org.apache.tika: WARN
 
-
+# 关闭多余 log4j 调试（避免日志泛滥）
 log4j:
   logger:
     org:
       apache:
-        tika=DEBUG:
+        tika: WARN
+
+#
+#log4j:
+#  logger:
+#    org:
+#      apache:
+#        tika=DEBUG:
 
 deepseek:
   api:
-    url: https://dashscope.aliyuncs.com/compatible-mode/v1 # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
-    model: qwen-turbo  # 本地: deepseek-r1:7b, 官方: deepseek-chat deepseek-ai/DeepSeek-R1
-    key: sk-c502ba1f6f034be9850462418960a7a4 # DeepSeek API Key 如果是本地就为空
+    url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    model: qwen-turbo
+    key: "sk-572abd7f7cbe4c4086464d2f99a37c8b"
 #deepseek:
 #  api:
 #    url: https://api.siliconflow.cn/v1/chat/completions
 #    model: deepseek-ai/DeepSeek-R1
 #    key: sk-tftrzvvzrpdnnranijycrmrhfvtxpiakrpeancwhpdkhjece
 
+#阿里云embedding模型
+#embedding:
+#  api:
+#    url: https://dashscope.aliyuncs.com/compatible-mode/v1
+#    key: "sk-572abd7f7cbe4c4086464d2f99a37c8b"
+#    model: tongyi-embedding-vision-plus-2026-03-06
+#    dimension:
+
 embedding:
   api:
-    url: https://dashscope.aliyuncs.com/compatible-mode/v1
-    #    key: a3dcfc9c-6bd7-4121-8c08-75ae7ea0e94f   # 填入通义千问API key
-    key: sk-c502ba1f6f034be9850462418960a7a4
-    model: text-embedding-v4
-    dimension: 2048  # 指定向量维度
+    url: https://api.siliconflow.cn/v1
+    key: "sk-hecghnbhbnqdtbakljmlwticvpfmyswnepboqqvtzybpdquo"
+    model: Qwen/Qwen3-VL-Embedding-8B
+    dimension: 1024
 
 ai:
   prompt:

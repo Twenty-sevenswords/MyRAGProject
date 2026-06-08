@@ -1,6 +1,6 @@
 package com.yizhaoqi.smartpai.langgraph.node;
 
-import com.yizhaoqi.smartpai.entity.QaMemoryEntry;
+import com.yizhaoqi.smartpai.dto.QaMemoryEntry;
 import com.yizhaoqi.smartpai.langgraph.event.GraphEvent;
 import com.yizhaoqi.smartpai.langgraph.state.AIState;
 import com.yizhaoqi.smartpai.service.QaMemoryService;

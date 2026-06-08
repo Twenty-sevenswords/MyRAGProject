@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.entity;
+package com.yizhaoqi.smartpai.dto;
 
 import java.time.LocalDateTime;
 

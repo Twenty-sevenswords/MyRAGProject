@@ -1,8 +1,9 @@
 // frontend/src/composables/useAgentWebSocket.ts
 import { ref, onUnmounted } from 'vue'
+import { buildWebSocketURL } from '@/utils/service'
 
 export interface AgentEvent {
-  type: 'AGENT_START' | 'AGENT_COMPLETE' | 'FINAL_REPLY' | 'ERROR' | 'FALLBACK'
+  type: 'start' | 'complete' | 'stream' | 'final' | 'error' | 'fallback'
   agent: string
   message: string
   data?: Record<string, any>
@@ -27,7 +28,7 @@ export function useAgentWebSocket() {
     // 清理旧连接
     disconnect()
 
-    const wsUrl = `ws://localhost:8081/ws/agent-chat?sessionId=${sessionId}&userId=${userId}`
+    const wsUrl = buildWebSocketURL('/ws/agent-chat', { sessionId, userId })
     ws = new WebSocket(wsUrl)
 
     ws.onopen = () => {
@@ -41,13 +42,13 @@ export function useAgentWebSocket() {
         events.value.push(data)
 
         // 更新Agent状态
-        if (data.type === 'AGENT_START') {
+        if (data.type === 'start') {
           currentStatus.value[data.agent] = {
             state: 'running',
             message: data.message,
             startTime: data.timestamp
           }
-        } else if (data.type === 'AGENT_COMPLETE') {
+        } else if (data.type === 'complete') {
           const current = currentStatus.value[data.agent]
           if (current) {
             current.state = 'success'
@@ -55,7 +56,7 @@ export function useAgentWebSocket() {
             current.endTime = data.timestamp
             current.data = data.data
           }
-        } else if (data.type === 'ERROR') {
+        } else if (data.type === 'error') {
           currentStatus.value[data.agent] = {
             state: 'error',
             message: data.message

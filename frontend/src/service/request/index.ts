@@ -13,10 +13,7 @@ const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
 function getFlatRequest(options: Partial<RequestOption<App.Service.Response>> = {}) {
   const request = createFlatRequest<App.Service.Response, RequestInstanceState>(
     {
-      baseURL,
-      headers: {
-        apifoxToken: 'FY65Vng88xra_BveQ5E_4'
-      }
+      baseURL
     },
     {
       async onRequest(config) {

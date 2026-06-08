@@ -1,6 +1,38 @@
 import json5 from 'json5';
 
 /**
+ * Get WebSocket base URL based on current environment
+ * In production, use relative path with the current host
+ * In development with proxy, use proxy path
+ */
+export function getWebSocketBaseURL(): string {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}`;
+}
+
+/**
+ * Build WebSocket URL with path and query params
+ *
+ * @param path - WebSocket path (e.g., '/ws/mcp', '/ws/agent-chat')
+ * @param params - Query parameters
+ */
+export function buildWebSocketURL(path: string, params?: Record<string, string>): string {
+  const isDevProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
+  const baseURL = getWebSocketBaseURL();
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const proxyPath = isDevProxy ? `/proxy-ws${normalizedPath}` : normalizedPath;
+  const url = new URL(proxyPath, baseURL);
+
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
+    });
+  }
+
+  return url.toString();
+}
+
+/**
  * Create service config by current env
  *
  * @param env The current env

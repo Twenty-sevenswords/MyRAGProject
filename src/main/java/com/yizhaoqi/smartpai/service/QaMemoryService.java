@@ -1,9 +1,9 @@
 package com.yizhaoqi.smartpai.service;
 
-import com.yizhaoqi.smartpai.config.QaMemoryProperties;
-import com.yizhaoqi.smartpai.entity.AgentIntent;
-import com.yizhaoqi.smartpai.entity.AgentResult;
-import com.yizhaoqi.smartpai.entity.QaMemoryEntry;
+import com.yizhaoqi.smartpai.config.properties.QaMemoryProperties;
+import com.yizhaoqi.smartpai.dto.AgentIntent;
+import com.yizhaoqi.smartpai.dto.AgentResult;
+import com.yizhaoqi.smartpai.dto.QaMemoryEntry;
 import com.yizhaoqi.smartpai.repository.RedisRepository;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
@@ -294,6 +294,17 @@ public class QaMemoryService {
     public void cleanUserExpiredMemories(String userId) {
         redisRepository.cleanExpiredQaMemories(userId, properties.getKeyPrefix());
         logger.info("[QaMemory] 已清理用户 {} 的过期记忆", userId);
+    }
+
+    /**
+     * 按记忆ID删除问答记忆
+     */
+    public void deleteMemoryById(String userId, String memoryId) {
+        if (userId == null || userId.isBlank() || memoryId == null || memoryId.isBlank()) {
+            return;
+        }
+        redisRepository.deleteQaMemory(userId, memoryId, properties.getKeyPrefix());
+        logger.info("[QaMemory] 已删除问答记忆, userId={}, memoryId={}", userId, memoryId);
     }
 
     /**

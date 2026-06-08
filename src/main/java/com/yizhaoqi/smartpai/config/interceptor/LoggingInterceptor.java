@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.config;
+package com.yizhaoqi.smartpai.config.interceptor;
 
 import com.yizhaoqi.smartpai.utils.JwtUtils;
 import com.yizhaoqi.smartpai.utils.LogUtils;

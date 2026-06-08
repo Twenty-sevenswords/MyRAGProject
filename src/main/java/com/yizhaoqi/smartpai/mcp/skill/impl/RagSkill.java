@@ -1,6 +1,6 @@
 package com.yizhaoqi.smartpai.mcp.skill.impl;
 
-import com.yizhaoqi.smartpai.entity.SearchResult;
+import com.yizhaoqi.smartpai.dto.SearchResult;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.skill.*;
 import com.yizhaoqi.smartpai.service.HybridSearchService;

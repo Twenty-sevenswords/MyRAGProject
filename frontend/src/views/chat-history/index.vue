@@ -48,7 +48,7 @@ async function getList() {
     params: params.value
   });
   if (!error) {
-    list.value = data;
+    list.value = Array.isArray(data) ? data : [];
     scrollToBottom();
   }
   loading.value = false;

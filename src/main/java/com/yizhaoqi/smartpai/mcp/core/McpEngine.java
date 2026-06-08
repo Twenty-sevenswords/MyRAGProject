@@ -1,6 +1,6 @@
 package com.yizhaoqi.smartpai.mcp.core;
 
-import com.yizhaoqi.smartpai.entity.QaMemoryEntry;
+import com.yizhaoqi.smartpai.dto.QaMemoryEntry;
 import com.yizhaoqi.smartpai.mcp.context.McpContext;
 import com.yizhaoqi.smartpai.mcp.context.McpState;
 import com.yizhaoqi.smartpai.mcp.event.McpEvent;
@@ -468,9 +468,11 @@ public class McpEngine {
                     
                     // 从最后一个事件提取结果
                     if (events != null && !events.isEmpty()) {
-                        SkillEvent lastEvent = events.get(events.size() - 1);
-                        if (lastEvent.getData() instanceof SkillResult) {
-                            result = (SkillResult) lastEvent.getData();
+                        for (SkillEvent event : events) {
+                            if (event.getType() == SkillEvent.EventType.RESULT
+                                    && event.getData() instanceof SkillResult) {
+                                result = (SkillResult) event.getData();
+                            }
                         }
                     }
                 } else {
@@ -498,7 +500,8 @@ public class McpEngine {
         }
         
         // 关键：RAG 无结果时自动 fallback 到联网搜索
-        if (context.getFinalReply() == null || context.getFinalReply().trim().isEmpty() && context.isWebSearchEnabled()) {
+        boolean hasNoFinalReply = context.getFinalReply() == null || context.getFinalReply().trim().isEmpty();
+        if (hasNoFinalReply && context.isWebSearchEnabled()) {
             logger.info("[MCP] RAG 无结果，自动 fallback 到联网搜索");
             executeFallbackWebSearch(context, sink);
         }

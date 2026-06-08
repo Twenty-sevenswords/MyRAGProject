@@ -6,6 +6,7 @@ defineOptions({ name: 'ChatMessage' });
 const props = defineProps<{ msg: Api.Chat.Message }>();
 
 const authStore = useAuthStore();
+const displayUsername = computed(() => props.msg.username || authStore.userInfo.username);
 
 function handleCopy(content: string) {
   navigator.clipboard.writeText(content);
@@ -97,7 +98,7 @@ async function handleSourceFileClick(fileName: string) {
         <SvgIcon icon="ph:user-circle" class="text-icon-large color-white" />
       </NAvatar>
       <div class="flex-col gap-1">
-        <NText class="text-4 font-bold">{{ authStore.userInfo.username }}</NText>
+        <NText class="text-4 font-bold">{{ displayUsername }}</NText>
         <NText class="text-3 color-gray-500">{{ formatDate(msg.timestamp) }}</NText>
       </div>
     </div>
@@ -106,7 +107,7 @@ async function handleSourceFileClick(fileName: string) {
         <SystemLogo class="text-6 text-white" />
       </NAvatar>
       <div class="flex-col gap-1">
-        <NText class="text-4 font-bold">派聪明</NText>
+        <NText class="text-4 font-bold">杨志博毕设</NText>
         <NText class="text-3 color-gray-500">{{ formatDate(msg.timestamp) }}</NText>
       </div>
     </div>

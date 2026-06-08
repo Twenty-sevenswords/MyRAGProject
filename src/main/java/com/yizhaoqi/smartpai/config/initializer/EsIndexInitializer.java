@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.config;
+package com.yizhaoqi.smartpai.config.initializer;
 
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.yizhaoqi.smartpai.util;
 
-import com.yizhaoqi.smartpai.entity.ChatMessage;
-import com.yizhaoqi.smartpai.entity.SearchResult;
+import com.yizhaoqi.smartpai.dto.ChatMessage;
+import com.yizhaoqi.smartpai.dto.SearchResult;
 
 import java.util.List;
 import java.util.Map;

@@ -4,15 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.yizhaoqi.smartpai.entity.ChatContext;
-import com.yizhaoqi.smartpai.entity.ChatMessage;
+import com.yizhaoqi.smartpai.dto.ChatContext;
+import com.yizhaoqi.smartpai.dto.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 聊天上下文服务
@@ -27,11 +32,19 @@ public class ChatContextService {
      * Redis Key前缀
      */
     private static final String KEY_PREFIX = "chat:context:session:";
+
+    private static final String CURRENT_CONVERSATION_KEY_PREFIX = "user:";
+
+    private static final String CURRENT_CONVERSATION_KEY_SUFFIX = ":current_conversation";
+
+    private static final String LEGACY_CONVERSATION_KEY_PREFIX = "conversation:";
     
     /**
      * 上下文过期时间：30分钟
      */
     private static final Duration EXPIRE_DURATION = Duration.ofMinutes(30);
+
+    private static final Duration HISTORY_EXPIRE_DURATION = Duration.ofDays(7);
     
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -98,6 +111,7 @@ public class ChatContextService {
         try {
             String json = objectMapper.writeValueAsString(context);
             redisTemplate.opsForValue().set(key, json, EXPIRE_DURATION);
+            saveConversationHistorySnapshot(context);
             logger.info("保存上下文成功: key={}, sessionId={}, 消息数={}", 
                 key, context.getSessionId(),
                 context.getMessages() != null ? context.getMessages().size() : 0);
@@ -240,5 +254,38 @@ public class ChatContextService {
      */
     private String buildKey(String sessionId) {
         return KEY_PREFIX + sessionId;
+    }
+
+    private void saveConversationHistorySnapshot(ChatContext context) throws JsonProcessingException {
+        if (context == null || context.getSessionId() == null || context.getUserId() == null) {
+            return;
+        }
+
+        String currentConversationKey = CURRENT_CONVERSATION_KEY_PREFIX
+                + context.getUserId()
+                + CURRENT_CONVERSATION_KEY_SUFFIX;
+        redisTemplate.opsForValue().set(currentConversationKey, context.getSessionId(), HISTORY_EXPIRE_DURATION);
+
+        List<Map<String, String>> history = context.getAllHistory().stream()
+                .map(this::toHistoryItem)
+                .collect(Collectors.toList());
+        redisTemplate.opsForValue().set(
+                LEGACY_CONVERSATION_KEY_PREFIX + context.getSessionId(),
+                objectMapper.writeValueAsString(history),
+                HISTORY_EXPIRE_DURATION
+        );
+    }
+
+    private Map<String, String> toHistoryItem(ChatMessage message) {
+        Map<String, String> item = new LinkedHashMap<>();
+        item.put("role", message.getRole());
+        item.put("content", message.getContent());
+        item.put("timestamp", formatTimestamp(message.getTimestamp()));
+        return item;
+    }
+
+    private String formatTimestamp(LocalDateTime timestamp) {
+        LocalDateTime value = timestamp != null ? timestamp : LocalDateTime.now();
+        return value.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 }

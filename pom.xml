@@ -28,7 +28,21 @@
     </scm>
     <properties>
         <java.version>17</java.version>
+        <langchain4j.version>1.0.0-beta2</langchain4j.version>
+        <testcontainers.version>1.21.1</testcontainers.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -146,13 +160,6 @@
             <version>8.10.0</version>
         </dependency>
 
-        <!-- Jackson for JSON Processing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-
         <!-- Apache HttpClient (used internally by Elasticsearch client) -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -160,11 +167,11 @@
             <version>4.5.14</version>
         </dependency>
 
-        <!-- Gson (JSON Parsing) -->
+        <!-- Redisson - 分布式锁，解决多 Agent 并行写回 Redis 的竞态问题 -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.27.2</version>
         </dependency>
 
         <!-- Apache Commons Text (用于文本相似度计算) -->
@@ -179,35 +186,47 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
-            <version>0.36.2</version>
+            <version>${langchain4j.version}</version>
         </dependency>
-        
+
         <!-- LangChain4j OpenAI Compatible (支持 DeepSeek 等 OpenAI 兼容 API) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-open-ai</artifactId>
-            <version>0.36.2</version>
+            <version>${langchain4j.version}</version>
         </dependency>
-        
-        <!-- LangChain4j Spring Boot Starter -->
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-spring-boot-starter</artifactId>
-            <version>0.36.2</version>
-        </dependency>
-        
+
         <!-- LangChain4j Elasticsearch Embedding Store -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-elasticsearch</artifactId>
-            <version>0.36.2</version>
+            <version>${langchain4j.version}</version>
         </dependency>
-        
-        <!-- LangChain4j Redis Embedding Store (用于记忆存储) -->
+
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-redis</artifactId>
-            <version>0.36.2</version>
+            <artifactId>langchain4j-mcp</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
+        <!-- ========== Observability ========== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -238,6 +257,25 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -2,7 +2,7 @@ package com.yizhaoqi.smartpai.test;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.yizhaoqi.smartpai.entity.EsDocument;
+import com.yizhaoqi.smartpai.dto.EsDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

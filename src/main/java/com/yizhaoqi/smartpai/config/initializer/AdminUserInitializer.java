@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.config;
+package com.yizhaoqi.smartpai.config.initializer;
 
 import com.yizhaoqi.smartpai.model.User;
 import com.yizhaoqi.smartpai.repository.UserRepository;

@@ -1,8 +1,8 @@
 package com.yizhaoqi.smartpai.service;
 
 import com.yizhaoqi.smartpai.model.DocumentVector;
-import com.yizhaoqi.smartpai.entity.EsDocument;
-import com.yizhaoqi.smartpai.entity.TextChunk;
+import com.yizhaoqi.smartpai.dto.EsDocument;
+import com.yizhaoqi.smartpai.dto.TextChunk;
 import com.yizhaoqi.smartpai.repository.DocumentVectorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

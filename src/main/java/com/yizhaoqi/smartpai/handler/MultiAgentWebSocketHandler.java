@@ -5,130 +5,98 @@ import com.yizhaoqi.smartpai.mcp.event.McpEvent;
 import com.yizhaoqi.smartpai.mcp.service.McpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.*;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 多Agent WebSocket处理器
- * 使用 MCP AI Agent 平台进行流式对话
+ * Multi-agent websocket handler backed by MCP service.
  */
 @Component
-public class MultiAgentWebSocketHandler extends TextWebSocketHandler {
+public class MultiAgentWebSocketHandler extends BaseWebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiAgentWebSocketHandler.class);
 
-    @Autowired
-    private McpService mcpService;
+    private final McpService mcpService;
+    private final Map<String, WebSocketSession> sessions = newSessionMap();
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    // 会话管理
-    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String sessionId = extractSessionId(session);
-        if (sessionId == null) {
-            sessionId = "sess_" + System.currentTimeMillis() + "_" +
-                Integer.toHexString((int) (Math.random() * 0xFFFFFF));
-        }
-        sessions.put(sessionId, session);
-        logger.info("Agent WebSocket连接建立: sessionId={}, userId={}", sessionId, extractUserId(session));
+    public MultiAgentWebSocketHandler(McpService mcpService, ObjectMapper objectMapper) {
+        super(objectMapper);
+        this.mcpService = mcpService;
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String sessionId = extractSessionId(session);
-        String userId = extractUserId(session);
-        String payload = message.getPayload();
+    public void afterConnectionEstablished(WebSocketSession session) {
+        String sessionId = ensureSessionAttribute(session, "sessionId", "sess_");
+        sessions.put(sessionId, session);
+        logger.info("Agent socket connected: sessionId={}, userId={}", sessionId, extractUserId(session));
+    }
 
-        logger.info("收到Agent消息: sessionId={}, payload={}", sessionId, payload);
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        String sessionId = ensureSessionAttribute(session, "sessionId", "sess_");
+        String userId = extractUserId(session);
 
         try {
-            // 解析用户消息
-            ChatRequest request = objectMapper.readValue(payload, ChatRequest.class);
-            
-            // 如果消息中没有userId，使用session中的
-            if (request.getUserId() == null || request.getUserId().isEmpty()) {
+            ChatRequest request = objectMapper.readValue(message.getPayload(), ChatRequest.class);
+            if (request.getUserId() == null || request.getUserId().isBlank()) {
                 request.setUserId(userId);
             }
 
-            // 调用 MCP AI Agent 服务
             mcpService.chat(request.getMessage(), sessionId, request.getUserId())
-                    .doOnNext(event -> logger.debug("发送事件: type={}, agent={}", event.getType(), event.getAgent()))
                     .subscribe(
-                        event -> sendEventSafely(session, event),
-                        error -> {
-                            logger.error("Agent处理错误: sessionId={}", sessionId, error);
-                            sendEventSafely(session, McpEvent.error(error.getMessage(), sessionId));
-                        },
-                        () -> logger.info("Agent处理完成: sessionId={}", sessionId)
+                            event -> safeSend(session, event, logger, "agent"),
+                            error -> {
+                                logger.error("Agent processing failed: sessionId={}", sessionId, error);
+                                safeSend(session, McpEvent.error(error.getMessage(), sessionId), logger, "agent");
+                            },
+                            () -> logger.info("Agent processing completed: sessionId={}", sessionId)
                     );
-
         } catch (Exception e) {
-            logger.error("解析消息失败: {}", e.getMessage(), e);
-            sendEventSafely(session, McpEvent.error("消息解析失败: " + e.getMessage(), sessionId));
-        }
-    }
-
-    /**
-     * 安全发送事件到WebSocket
-     */
-    private void sendEventSafely(WebSocketSession session, McpEvent event) {
-        if (session == null || !session.isOpen()) {
-            logger.warn("Session已关闭，跳过发送: event={}", event.getType());
-            return;
-        }
-        
-        try {
-            String json = objectMapper.writeValueAsString(event);
-            synchronized (session) {
-                if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(json));
-                    logger.debug("已发送事件: {}", json.substring(0, Math.min(100, json.length())));
-                }
-            }
-        } catch (Exception e) {
-            logger.error("发送事件失败: event={}", event.getType(), e);
+            logger.error("Failed to parse agent request", e);
+            safeSend(session, McpEvent.error("Message parse failed: " + e.getMessage(), sessionId), logger, "agent");
         }
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        String sessionId = extractSessionId(session);
-        if (sessionId != null) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        String sessionId = attribute(session, "sessionId", "");
+        if (!sessionId.isBlank()) {
             sessions.remove(sessionId);
         }
-        logger.info("Agent WebSocket连接关闭: sessionId={}, status={}", sessionId, status);
+        logger.info("Agent socket closed: sessionId={}, status={}", sessionId, status);
     }
-    
+
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        logger.error("WebSocket传输错误: sessionId={}", extractSessionId(session), exception);
+    public void handleTransportError(WebSocketSession session, Throwable exception) {
+        logger.error("Agent socket transport error: sessionId={}", attribute(session, "sessionId", ""), exception);
     }
 
-    private String extractSessionId(WebSocketSession session) {
-        return (String) session.getAttributes().get("sessionId");
-    }
-    
     private String extractUserId(WebSocketSession session) {
-        return (String) session.getAttributes().getOrDefault("userId", "anonymous");
+        return attribute(session, "userId", "anonymous");
     }
 
-    // 内部请求类
     public static class ChatRequest {
         private String message;
         private String userId;
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        public String getUserId() { return userId; }
-        public void setUserId(String userId) { this.userId = userId; }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
     }
 }

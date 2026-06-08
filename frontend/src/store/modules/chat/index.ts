@@ -1,4 +1,5 @@
 import { useWebSocket } from '@vueuse/core';
+import { buildWebSocketURL } from '@/utils/service';
 
 // 聊天模式类型
 export type ChatMode = 'normal' | 'agent';
@@ -38,13 +39,21 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
   let agentWs: WebSocket | null = null;
   let agentWsStatus = ref<'CONNECTING' | 'OPEN' | 'CLOSED'>('CLOSED');
 
+  const resetAgentTrace = () => {
+    agentEvents.value = [];
+    agentStatus.value = {};
+  };
+
   // 连接Agent WebSocket
   const connectAgentWs = (sessionId: string) => {
     if (agentWs) {
       agentWs.close();
     }
-    // 修正：连接到 /ws/mcp 而不是 /ws/agent-chat
-    const wsUrl = `ws://localhost:8081/ws/mcp?sessionId=${sessionId}&userId=${store.userInfo?.username || 'anonymous'}`;
+    // 使用动态构建的 WebSocket URL
+    const wsUrl = buildWebSocketURL('/ws/agent-chat', {
+      sessionId,
+      userId: store.userInfo?.username || 'anonymous'
+    });
     console.log('正在连接 Agent WebSocket:', wsUrl);
     agentWsStatus.value = 'CONNECTING';
     agentWs = new WebSocket(wsUrl);
@@ -93,10 +102,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
           console.log('收到最终回复:', data.message?.substring(0, 100));
           const assistant = list.value[list.value.length - 1];
           if (assistant?.role === 'assistant') {
-            // 如果已经有流式内容，保留；否则使用final消息
-            if (!assistant.content || assistant.content.includes('🔄 Agent协作处理中')) {
-              assistant.content = data.message;
-            }
+            assistant.content = data.message;
             assistant.status = 'finished';
           }
         } else if (data.type === 'error') {
@@ -143,8 +149,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
       agentWs = null;
     }
     agentWsStatus.value = 'CLOSED';
-    agentEvents.value = [];
-    agentStatus.value = {};
+    resetAgentTrace();
   };
 
   // 切换聊天模式
@@ -159,10 +164,14 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
 
   // 根据当前模式发送消息
   const sendMessage = (message: string) => {
+    const normalizedMessage = message.trim();
+    if (!normalizedMessage) return;
+
     if (chatMode.value === 'agent') {
-      agentWsSend(message);
+      resetAgentTrace();
+      agentWsSend(normalizedMessage);
     } else {
-      wsSend(message);
+      wsSend(normalizedMessage);
     }
   };
 
@@ -186,6 +195,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
     setChatMode,
     sendMessage,
     connectAgentWs,
-    disconnectAgentWs
+    disconnectAgentWs,
+    resetAgentTrace
   };
 });

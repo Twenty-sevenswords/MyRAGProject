@@ -138,7 +138,7 @@ public class ConversationController {
                 
                 if (end_date != null && !end_date.trim().isEmpty()) {
                     try {
-                        endDateTime = parseDateTime(end_date);
+                        endDateTime = parseDateTime(end_date, true);
                         LogUtils.logBusiness("GET_CONVERSATIONS", username, "解析结束时间: %s -> %s", end_date, endDateTime);
                     } catch (Exception e) {
                         LogUtils.logBusinessError("GET_CONVERSATIONS", username, "结束时间解析失败: %s", e, end_date);
@@ -154,8 +154,7 @@ public class ConversationController {
                     if (startDateTime != null || endDateTime != null) {
                         if (!"未知时间".equals(messageTimestamp)) {
                             try {
-                                LocalDateTime messageDateTime = LocalDateTime.parse(messageTimestamp, 
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                                LocalDateTime messageDateTime = parseDateTime(messageTimestamp);
                                 
                                 // 检查是否在时间范围内
                                 if (startDateTime != null && messageDateTime.isBefore(startDateTime)) {
@@ -165,8 +164,8 @@ public class ConversationController {
                                     continue; // 跳过晚于结束时间的消息
                                 }
                             } catch (Exception e) {
-                                // 时间戳格式不正确，跳过过滤（包含所有消息）
                                 LogUtils.logBusinessError("GET_CONVERSATIONS", username, "消息时间戳格式错误: %s", e, messageTimestamp);
+                                continue;
                             }
                         }
                         // 如果是"未知时间"且设置了时间过滤，跳过该消息
@@ -209,8 +208,19 @@ public class ConversationController {
      * 解析日期时间字符串，支持多种格式
      */
     private LocalDateTime parseDateTime(String dateTimeStr) {
+        return parseDateTime(dateTimeStr, false);
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeStr, boolean endOfDay) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return null;
+        }
+
+        dateTimeStr = dateTimeStr.trim();
+
+        if (dateTimeStr.length() == 10) {
+            java.time.LocalDate date = java.time.LocalDate.parse(dateTimeStr);
+            return endOfDay ? date.atTime(java.time.LocalTime.MAX) : date.atStartOfDay();
         }
         
         try {
@@ -226,11 +236,6 @@ public class ConversationController {
                 // 尝试解析不带分钟和秒的格式 (2023-01-01T12)
                 if (dateTimeStr.length() == 13) {
                     return LocalDateTime.parse(dateTimeStr + ":00:00");
-                }
-                
-                // 尝试解析日期格式 (2023-01-01)
-                if (dateTimeStr.length() == 10) {
-                    return LocalDateTime.parse(dateTimeStr + "T00:00:00");
                 }
                 
                 // 如果以上都失败，尝试使用自定义格式解析

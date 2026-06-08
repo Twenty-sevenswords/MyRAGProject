@@ -185,6 +185,7 @@ declare namespace Api {
       content: string;
       status?: 'pending' | 'loading' | 'finished' | 'error';
       timestamp?: string;
+      username?: string;
     }
 
     interface Token {

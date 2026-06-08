@@ -3,7 +3,7 @@
     <n-drawer-content title="🤖 Agent协作监控" :native-scrollbar="false">
 
       <!-- Agent状态卡片 -->
-      <n-space vertical class="agent-cards">
+      <n-space v-if="hasAgentStatus" vertical class="agent-cards">
         <n-card
           v-for="(status, agentName) in agentStatus"
           :key="agentName"
@@ -22,14 +22,15 @@
           </n-text>
         </n-card>
       </n-space>
+      <n-empty v-else description="等待本轮Agent状态..." />
 
       <n-divider />
 
       <!-- 事件时间线 -->
       <n-timeline>
         <n-timeline-item
-          v-for="event in sortedEvents"
-          :key="event.timestamp"
+          v-for="(event, index) in sortedEvents"
+          :key="`${event.sessionId}-${event.timestamp}-${event.agent}-${event.type}-${index}`"
           :type="getEventType(event)"
           :title="`${event.agent} - ${event.type}`"
           :content="event.message"
@@ -69,6 +70,8 @@ const chatStore = useChatStore();
 const { agentEvents, agentStatus, chatMode } = storeToRefs(chatStore);
 
 const visible = ref(false)
+
+const hasAgentStatus = computed(() => Object.keys(agentStatus.value).length > 0)
 
 // 排序后的事件（最新的在前）
 const sortedEvents = computed(() =>

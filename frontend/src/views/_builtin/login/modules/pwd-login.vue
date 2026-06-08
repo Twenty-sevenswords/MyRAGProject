@@ -20,8 +20,8 @@ interface FormModel {
 }
 
 const model: FormModel = reactive({
-  userName: 'admin',
-  password: 'admin123'
+  userName: '',
+  password: ''
 });
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
@@ -71,7 +71,7 @@ async function handleAccountLogin(account: Account) {
 <template>
   <NForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
     <NFormItem path="userName">
-      <NInput v-model:value="model.userName" :placeholder="$t('page.login.common.userNamePlaceholder')">
+      <NInput v-model:value="model.userName" autocomplete="off" :placeholder="$t('page.login.common.userNamePlaceholder')">
         <template #prefix>
           <icon-ant-design:user-outlined />
         </template>
@@ -81,6 +81,7 @@ async function handleAccountLogin(account: Account) {
       <NInput
         v-model:value="model.password"
         type="password"
+        autocomplete="new-password"
         show-password-on="click"
         :placeholder="$t('page.login.common.passwordPlaceholder')"
       >

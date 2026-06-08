@@ -2,9 +2,9 @@ package com.yizhaoqi.smartpai.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yizhaoqi.smartpai.entity.MemoryEntry;
-import com.yizhaoqi.smartpai.entity.Message;
-import com.yizhaoqi.smartpai.entity.QaMemoryEntry;
+import com.yizhaoqi.smartpai.dto.MemoryEntry;
+import com.yizhaoqi.smartpai.dto.Message;
+import com.yizhaoqi.smartpai.dto.QaMemoryEntry;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -160,6 +160,14 @@ public class RedisRepository {
      */
     public void updateQaMemory(QaMemoryEntry entry, String keyPrefix, int expireDays) {
         saveQaMemory(entry, keyPrefix, expireDays);
+    }
+
+    /**
+     * 按记忆ID删除问答记忆
+     */
+    public void deleteQaMemory(String userId, String memoryId, String keyPrefix) {
+        String key = String.format("%s:user:%s:qa:%s", keyPrefix, userId, memoryId);
+        redisTemplate.delete(key);
     }
 
     /**
