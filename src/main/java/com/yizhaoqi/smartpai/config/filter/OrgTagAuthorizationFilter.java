@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -256,9 +256,12 @@ public class OrgTagAuthorizationFilter extends OncePerRequestFilter {
         logger.debug("尝试获取资源信息，资源ID: {}", resourceId);
         
         // 尝试从文件上传表中获取资源信息
-        Optional<FileUpload> fileUpload = fileUploadRepository.findByFileMd5(resourceId);
-        if (fileUpload.isPresent()) {
-            FileUpload file = fileUpload.get();
+        List<FileUpload> uploads = fileUploadRepository.findAllByFileMd5(resourceId);
+        if (!uploads.isEmpty()) {
+            FileUpload file = uploads.stream()
+                    .filter(FileUpload::isPublic)
+                    .findFirst()
+                    .orElse(uploads.get(0));
             ResourceInfo info = new ResourceInfo(
                 file.getUserId(),
                 file.getOrgTag(),

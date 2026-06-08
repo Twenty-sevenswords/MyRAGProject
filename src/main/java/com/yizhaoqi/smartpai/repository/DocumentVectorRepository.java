@@ -20,4 +20,12 @@ public interface DocumentVectorRepository extends JpaRepository<DocumentVector, 
     @Modifying
     @Query(value = "DELETE FROM document_vectors WHERE file_md5 = ?1", nativeQuery = true)
     void deleteByFileMd5(String fileMd5);
+
+    /**
+     * Delete vectors for one user's copy of a file.
+     */
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM document_vectors WHERE file_md5 = ?1 AND user_id = ?2", nativeQuery = true)
+    void deleteByFileMd5AndUserId(String fileMd5, String userId);
 }

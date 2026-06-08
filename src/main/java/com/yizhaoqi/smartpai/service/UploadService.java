@@ -380,7 +380,7 @@ public class UploadService {
     public int getTotalChunks(String fileMd5) {
         logger.info("计算文件总分片数 => fileMd5: {}", fileMd5);
         try {
-            Optional<FileUpload> fileUpload = fileUploadRepository.findByFileMd5(fileMd5);
+            Optional<FileUpload> fileUpload = fileUploadRepository.findFirstByFileMd5OrderByIdAsc(fileMd5);
 // PLACEHOLDER_TOTAL_CHUNKS
 
             if (fileUpload.isEmpty()) {
@@ -427,6 +427,13 @@ public class UploadService {
      * 合并所有分片为完整文件
      */
     public String mergeChunks(String fileMd5, String fileName) {
+        return mergeChunks(fileMd5, fileName, null);
+    }
+
+    /**
+     * 合并所有分片为完整文件
+     */
+    public String mergeChunks(String fileMd5, String fileName, String userId) {
         String fileType = getFileType(fileName);
         logger.info("开始合并分片 => fileMd5: {}, fileName: {}, fileType: {}", fileMd5, fileName, fileType);
         try {
@@ -512,9 +519,12 @@ public class UploadService {
                 deleteFileMark(fileMd5);
                 logger.info("Redis上传标记已删除 => fileMd5: {}, fileName: {}", fileMd5, fileName);
                 logger.info("更新文件上传状态为已完成 => fileMd5: {}, fileName: {}, fileType: {}", fileMd5, fileName, fileType);
-                FileUpload fileUpload = fileUploadRepository.findByFileMd5(fileMd5)
+                Optional<FileUpload> fileUploadOptional = userId == null || userId.isBlank()
+                        ? fileUploadRepository.findFirstByFileMd5OrderByIdAsc(fileMd5)
+                        : fileUploadRepository.findByFileMd5AndUserId(fileMd5, userId);
+                FileUpload fileUpload = fileUploadOptional
                         .orElseThrow(() -> {
-                            logger.error("更新状态时文件记录不存在 => fileMd5: {}, fileName: {}", fileMd5, fileName);
+                            logger.error("更新状态时文件记录不存在 => fileMd5: {}, fileName: {}, userId: {}", fileMd5, fileName, userId);
                             return new RuntimeException("文件上传记录不存在: " + fileMd5);
                         });
                 fileUpload.setStatus(1);

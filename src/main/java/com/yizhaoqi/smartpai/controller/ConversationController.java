@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.yizhaoqi.smartpai.exception.CustomException;
 import com.yizhaoqi.smartpai.model.User;
 import com.yizhaoqi.smartpai.repository.UserRepository;
+import com.yizhaoqi.smartpai.service.ConversationService;
 import com.yizhaoqi.smartpai.utils.JwtUtils;
 import com.yizhaoqi.smartpai.utils.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/users/conversation")
@@ -37,6 +40,9 @@ public class ConversationController {
     
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ConversationService conversationService;
 
     /**
      * 查询对话历史，从Redis中获取
@@ -110,6 +116,95 @@ public class ConversationController {
     /**
      * 从Redis获取对话历史
      */
+    @DeleteMapping
+    public ResponseEntity<?> clearConversationMemory(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) String sessionId) {
+
+        String username = null;
+        try {
+            username = jwtUtils.extractUsernameFromToken(token.replace("Bearer ", ""));
+            if (username == null || username.isEmpty()) {
+                throw new CustomException("无效的token", HttpStatus.UNAUTHORIZED);
+            }
+
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new CustomException("用户不存在", HttpStatus.NOT_FOUND));
+
+            long deletedConversations = conversationService.clearUserConversations(username);
+            int deletedRedisKeys = clearRedisConversationMemory(user, username, sessionId);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("deletedConversations", deletedConversations);
+            data.put("deletedRedisKeys", deletedRedisKeys);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "新对话已创建，历史记忆已清空");
+            response.put("data", data);
+            return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            return ResponseEntity.status(e.getStatus()).body(Map.of(
+                    "code", e.getStatus().value(),
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            LogUtils.logBusinessError("CLEAR_CONVERSATION_MEMORY", username, "清空对话记忆失败: %s", e, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "code", 500,
+                    "message", "服务端清空记忆失败: " + e.getMessage()
+            ));
+        }
+    }
+
+    private int clearRedisConversationMemory(User user, String username, String currentSessionId) {
+        int deleted = 0;
+        Set<String> sessionIds = new LinkedHashSet<>();
+        List<String> userKeys = List.of(username, String.valueOf(user.getId()));
+
+        for (String userKey : userKeys) {
+            sessionIds.add("session:" + userKey);
+
+            String currentConversationKey = "user:" + userKey + ":current_conversation";
+            String existingSessionId = redisTemplate.opsForValue().get(currentConversationKey);
+            if (existingSessionId != null && !existingSessionId.isBlank()) {
+                sessionIds.add(existingSessionId);
+            }
+
+            deleted += deleteRedisKey(currentConversationKey);
+            deleted += deleteRedisPattern("qa:memory:user:" + userKey + ":qa:*");
+            deleted += deleteRedisPattern("mcp:qa_cache:" + userKey + ":*");
+        }
+
+        if (currentSessionId != null && !currentSessionId.isBlank()) {
+            sessionIds.add(currentSessionId);
+        }
+
+        for (String sessionId : sessionIds) {
+            deleted += deleteRedisKey("conversation:" + sessionId);
+            deleted += deleteRedisKey("chat:context:session:" + sessionId);
+            deleted += deleteRedisKey("mcp:history:" + sessionId);
+            deleted += deleteRedisKey("mcp:memory:" + sessionId);
+            deleted += deleteRedisPattern("pai:memory:" + sessionId + ":*");
+        }
+
+        return deleted;
+    }
+
+    private int deleteRedisKey(String key) {
+        return Boolean.TRUE.equals(redisTemplate.delete(key)) ? 1 : 0;
+    }
+
+    private int deleteRedisPattern(String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys == null || keys.isEmpty()) {
+            return 0;
+        }
+
+        Long deleted = redisTemplate.delete(keys);
+        return deleted == null ? 0 : deleted.intValue();
+    }
+
     private ResponseEntity<?> getConversationsFromRedis(String conversationId, String username, String start_date, String end_date, LogUtils.PerformanceMonitor monitor) {
         // 从Redis获取对话历史
         String key = "conversation:" + conversationId;

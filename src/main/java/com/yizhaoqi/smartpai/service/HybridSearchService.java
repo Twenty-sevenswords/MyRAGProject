@@ -70,12 +70,12 @@ public class HybridSearchService {
 
         try {
             List<String> userEffectiveTags = getUserEffectiveOrgTags(userId);
-            String userDbId = getUserDbId(userId);
+            List<String> userSearchIds = getUserSearchIds(userId);
 
             List<Float> queryVector = embedToVectorList(query);
             if (queryVector == null) {
                 logger.warn("Embedding generation failed, fallback to text-only permission search.");
-                return textOnlySearchWithPermission(query, userDbId, userEffectiveTags, topK);
+                return textOnlySearchWithPermission(query, userSearchIds, userEffectiveTags, topK);
             }
 
             SearchResponse<EsDocument> response = esClient.search(s -> {
@@ -89,8 +89,7 @@ public class HybridSearchService {
                         .numCandidates(recallK));
 
                 s.query(q -> q.bool(b -> b
-                        .must(m -> m.match(ma -> ma.field("textContent").query(query)))
-                        .filter(f -> f.bool(bf -> applyPermissionFilter(bf, userDbId, userEffectiveTags)))));
+                        .filter(f -> f.bool(bf -> applyPermissionFilter(bf, userSearchIds, userEffectiveTags)))));
 
                 s.rescore(r -> r
                         .windowSize(recallK)
@@ -112,7 +111,7 @@ public class HybridSearchService {
         } catch (Exception e) {
             logger.error("Permission-aware hybrid search failed.", e);
             try {
-                return textOnlySearchWithPermission(query, getUserDbId(userId), getUserEffectiveOrgTags(userId), topK);
+                return textOnlySearchWithPermission(query, getUserSearchIds(userId), getUserEffectiveOrgTags(userId), topK);
             } catch (Exception fallbackError) {
                 logger.error("Fallback text-only permission search also failed.", fallbackError);
                 return Collections.emptyList();
@@ -121,7 +120,7 @@ public class HybridSearchService {
     }
 
     private List<SearchResult> textOnlySearchWithPermission(String query,
-                                                            String userDbId,
+                                                            List<String> userSearchIds,
                                                             List<String> userEffectiveTags,
                                                             int topK) {
         try {
@@ -129,7 +128,7 @@ public class HybridSearchService {
                             .index("knowledge_base")
                             .query(q -> q.bool(b -> b
                                     .must(m -> m.match(ma -> ma.field("textContent").query(query)))
-                                    .filter(f -> f.bool(bf -> applyPermissionFilter(bf, userDbId, userEffectiveTags)))))
+                                    .filter(f -> f.bool(bf -> applyPermissionFilter(bf, userSearchIds, userEffectiveTags)))))
                             .minScore(0.3d)
                             .size(topK),
                     EsDocument.class
@@ -204,9 +203,16 @@ public class HybridSearchService {
     }
 
     private BoolQuery.Builder applyPermissionFilter(BoolQuery.Builder builder,
-                                                    String userDbId,
+                                                    List<String> userSearchIds,
                                                     List<String> userEffectiveTags) {
-        builder.should(s1 -> s1.term(t -> t.field("userId").value(userDbId)))
+        if (userSearchIds != null) {
+            userSearchIds.stream()
+                    .filter(id -> id != null && !id.isBlank())
+                    .distinct()
+                    .forEach(id -> builder.should(s -> s.term(t -> t.field("userId").value(id))));
+        }
+
+        builder.should(s1 -> s1.term(t -> t.field("isPublic").value(true)))
                 .should(s2 -> s2.term(t -> t.field("public").value(true)))
                 .should(s3 -> {
                     if (userEffectiveTags == null || userEffectiveTags.isEmpty()) {
@@ -220,6 +226,7 @@ public class HybridSearchService {
                         return inner;
                     });
                 });
+        builder.minimumShouldMatch("1");
         return builder;
     }
 
@@ -275,13 +282,13 @@ public class HybridSearchService {
         }
     }
 
-    private String getUserDbId(String userId) {
+    private List<String> getUserSearchIds(String userId) {
         try {
             User user = loadUserByIdOrUsername(userId);
-            return user.getUsername();
+            return List.of(String.valueOf(user.getId()), user.getUsername());
         } catch (Exception e) {
-            logger.error("Get user db-id failed, userId={}", userId, e);
-            throw new RuntimeException("Get user db-id failed", e);
+            logger.error("Get user search ids failed, userId={}", userId, e);
+            throw new RuntimeException("Get user search ids failed", e);
         }
     }
 
@@ -308,7 +315,7 @@ public class HybridSearchService {
 
             List<FileUpload> uploads = fileUploadRepository.findByFileMd5In(new ArrayList<>(md5Set));
             Map<String, String> md5ToName = uploads.stream()
-                    .collect(Collectors.toMap(FileUpload::getFileMd5, FileUpload::getFileName));
+                    .collect(Collectors.toMap(FileUpload::getFileMd5, FileUpload::getFileName, (left, right) -> left));
 
             results.forEach(result -> result.setFileName(md5ToName.get(result.getFileMd5())));
         } catch (Exception e) {

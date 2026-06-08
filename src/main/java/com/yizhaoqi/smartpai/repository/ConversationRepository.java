@@ -27,6 +27,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
      * @return 符合条件的对话记录列表
      */
     List<Conversation> findByUserId(Long userId);
+
+    long deleteByUserId(Long userId);
     
     /**
      * 根据时间范围查询所有对话记录。

@@ -8,6 +8,7 @@ import com.yizhaoqi.smartpai.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,14 @@ public class ConversationService {
         conversation.setAnswer(answer);
 
         conversationRepository.save(conversation);
+    }
+
+    @Transactional
+    public long clearUserConversations(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
+
+        return conversationRepository.deleteByUserId(user.getId());
     }
 
     /**

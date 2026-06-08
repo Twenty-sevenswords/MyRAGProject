@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -161,9 +160,9 @@ public class UploadController {
             String fileName = "unknown";
             String fileType = "unknown";
             try {
-                Optional<FileUpload> fileUpload = fileUploadRepository.findByFileMd5(fileMd5);
-                if (fileUpload.isPresent()) {
-                    fileName = fileUpload.get().getFileName();
+                FileUpload fileUpload = fileUploadRepository.findFirstByFileMd5OrderByIdAsc(fileMd5).orElse(null);
+                if (fileUpload != null) {
+                    fileName = fileUpload.getFileName();
                     fileType = getFileType(fileName);
                 }
             } catch (Exception e) {
@@ -263,7 +262,7 @@ public class UploadController {
 
             // 闂備礁鎲￠懝楣冩偋閸℃稒鍤愰柣鏃傚帶濡﹢鏌涢妷顖炴妞?
             LogUtils.logBusiness("MERGE_FILE", userId, "闁诲孩顔栭崰鎺楀磻閹炬枼鏀芥い鏃傗拡閸庡繘鏌熼濂稿弰闁绘侗鍣ｉ幊婊堝垂椤愩倐鍋撻娴庡綊鎮╅悜妯笺€愰梺鎼炲妼闁帮綁骞? fileMd5=%s, fileName=%s, fileType=%s, 闂備礁鎲＄敮鎺懳涘☉娆愭珷闁哄稁鍘奸弸浣该归崗鍏肩稇婵?%d", request.fileMd5(), request.fileName(), fileType, totalChunks);
-            String objectUrl = uploadService.mergeChunks(request.fileMd5(), request.fileName());
+            String objectUrl = uploadService.mergeChunks(request.fileMd5(), request.fileName(), userId);
             LogUtils.logFileOperation(userId, "MERGE", request.fileName(), request.fileMd5(), "SUCCESS");
 
             // 闂備礁鎲￠悷锕傚垂閸ф鐒垫い鎴炲椤︾兘鏌熼獮鍨伈鐎规洘绻堥崹楣冨礃閼碱剙甯?Kafka闂備焦瀵х粙鎴︽嚐椤栨壕鍋撻崹顐€跨€规洏鍎甸、鏇㈠閵忊剝顔呴梻浣芥〃缁€渚€顢氶鐐╂灁闁硅揪绠戠痪褔鏌涢幇闈涙灍妞ゅ孩鐟ヨ彁闁搞儻绲芥晶鎻捗?

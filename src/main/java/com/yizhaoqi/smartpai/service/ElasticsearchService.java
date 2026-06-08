@@ -83,4 +83,21 @@ public class ElasticsearchService {
             throw new RuntimeException("删除文档失败", e);
         }
     }
+
+    /**
+     * Delete indexed chunks for one user's copy of a file.
+     */
+    public void deleteByFileMd5AndUserId(String fileMd5, String userId) {
+        try {
+            DeleteByQueryRequest request = DeleteByQueryRequest.of(d -> d
+                    .index("knowledge_base")
+                    .query(q -> q.bool(b -> b
+                            .must(m -> m.term(t -> t.field("fileMd5").value(fileMd5)))
+                            .must(m -> m.term(t -> t.field("userId").value(userId)))))
+            );
+            esClient.deleteByQuery(request);
+        } catch (Exception e) {
+            throw new RuntimeException("删除用户文档失败", e);
+        }
+    }
 }

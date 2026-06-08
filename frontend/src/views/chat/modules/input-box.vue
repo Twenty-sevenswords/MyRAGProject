@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { fetchClearChatMemory } from '@/service/api';
 import type { ChatMode } from '@/store/modules/chat';
 
 const chatStore = useChatStore();
 const { input, list, wsStatus, wsData, chatMode, agentWsStatus, agentEvents } = storeToRefs(chatStore);
 
 // 当前会话ID（用于Agent模式）
-const currentSessionId = ref('sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+const createSessionId = () => `sess_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+const currentSessionId = ref(createSessionId());
+const newConversationLoading = ref(false);
 
 const latestMessage = computed(() => {
   return list.value[list.value.length - 1] ?? {};
@@ -33,7 +36,7 @@ const sendDisabled = computed(() => {
 // 普通模式WebSocket消息处理
 watch(wsData, val => {
   if (chatMode.value !== 'normal') return;
-  
+
   const data = JSON.parse(val);
   const assistant = list.value[list.value.length - 1];
 
@@ -47,30 +50,59 @@ watch(wsData, val => {
 });
 
 // Agent模式消息处理（已在store中处理）
-watch(agentEvents, (events) => {
-  if (chatMode.value !== 'agent' || events.length === 0) return;
-  
-  const lastEvent = events[events.length - 1];
-  const assistant = list.value[list.value.length - 1];
-  
-  // 注意：后端事件类型是小写的 start, complete, stream, final, error
-  if (lastEvent.type === 'start') {
-    if (assistant?.role === 'assistant') {
-      assistant.status = 'loading';
+watch(
+  agentEvents,
+  events => {
+    if (chatMode.value !== 'agent' || events.length === 0) return;
+
+    const lastEvent = events[events.length - 1];
+    const assistant = list.value[list.value.length - 1];
+
+    // 注意：后端事件类型是小写的 start, complete, stream, final, error
+    if (lastEvent.type === 'start') {
+      if (assistant?.role === 'assistant') {
+        assistant.status = 'loading';
+      }
+    } else if (lastEvent.type === 'stream') {
+      // 流式数据已经在 store 中处理，这里不需要重复处理
     }
-  } else if (lastEvent.type === 'stream') {
-    // 流式数据已经在 store 中处理，这里不需要重复处理
-  }
-}, { deep: true });
+  },
+  { deep: true }
+);
 
 // 切换聊天模式
 const handleModeChange = (mode: ChatMode) => {
   if (mode === 'agent') {
     // 生成新的会话ID并连接Agent WebSocket
-    currentSessionId.value = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    currentSessionId.value = createSessionId();
     chatStore.setChatMode('agent', currentSessionId.value);
   } else {
     chatStore.setChatMode('normal');
+  }
+};
+
+const handleNewConversation = async () => {
+  if (isSending.value) {
+    window.$message?.warning('正在回复中，请先停止当前回复');
+    return;
+  }
+
+  newConversationLoading.value = true;
+  try {
+    const { error } = await fetchClearChatMemory(currentSessionId.value);
+    if (error) {
+      window.$message?.error('新对话创建失败，请稍后重试');
+      return;
+    }
+
+    chatStore.resetConversationState();
+    currentSessionId.value = createSessionId();
+    if (chatMode.value === 'agent') {
+      chatStore.setChatMode('agent', currentSessionId.value);
+    }
+    window.$message?.success('已开启新对话');
+  } finally {
+    newConversationLoading.value = false;
   }
 };
 
@@ -82,7 +114,7 @@ const handleSend = async () => {
       if (error) return;
       chatStore.wsSend(JSON.stringify({ type: 'stop', _internal_cmd_token: data.cmdToken }));
     }
-    
+
     list.value[list.value.length - 1].status = 'finished';
     if (!latestMessage.value.content) list.value.pop();
     return;
@@ -142,22 +174,18 @@ const handShortcut = (e: KeyboardEvent) => {
 <template>
   <div class="relative w-full b-1 b-#1c1c1c20 bg-#fff p-4 card-wrapper dark:bg-#1c1c1c">
     <!-- 模式切换栏 -->
-    <div class="flex items-center justify-between mb-2">
-      <n-radio-group v-model:value="chatMode" @update:value="handleModeChange" size="small">
-        <n-radio-button value="normal">
-          💬 普通问答
-        </n-radio-button>
-        <n-radio-button value="agent">
-          🤖 Agent协作
-        </n-radio-button>
-      </n-radio-group>
-      
+    <div class="mb-2 flex items-center justify-between">
+      <NRadioGroup v-model:value="chatMode" size="small" @update:value="handleModeChange">
+        <NRadioButton value="normal">💬 普通问答</NRadioButton>
+        <NRadioButton value="agent">🤖 Agent协作</NRadioButton>
+      </NRadioGroup>
+
       <!-- Agent模式提示 -->
-      <n-text v-if="chatMode === 'agent'" depth="3" class="text-12px">
+      <NText v-if="chatMode === 'agent'" depth="3" class="text-12px">
         会话: {{ currentSessionId.slice(0, 12) }}...
-      </n-text>
+      </NText>
     </div>
-    
+
     <textarea
       ref="inputRef"
       v-model.trim="input.message"
@@ -166,15 +194,26 @@ const handShortcut = (e: KeyboardEvent) => {
       @keydown="handShortcut"
     />
     <div class="flex items-center justify-between pt-2">
-      <div class="flex items-center text-18px color-gray-500">
+      <div class="flex items-center gap-3 text-18px color-gray-500">
+        <NButton
+          size="small"
+          tertiary
+          type="primary"
+          :loading="newConversationLoading"
+          :disabled="isSending"
+          @click="handleNewConversation"
+        >
+          <template #icon>
+            <icon-material-symbols:add-comment-outline-rounded />
+          </template>
+          新对话
+        </NButton>
         <NText class="text-14px">连接状态：</NText>
         <icon-eos-icons:loading v-if="currentWsStatus === 'CONNECTING'" class="color-yellow" />
         <icon-fluent:plug-connected-checkmark-20-filled v-else-if="currentWsStatus === 'OPEN'" class="color-green" />
         <icon-tabler:plug-connected-x v-else class="color-red" />
         <!-- 模式标签 -->
-        <n-tag v-if="chatMode === 'agent'" type="info" size="small" class="ml-2">
-          Agent模式
-        </n-tag>
+        <NTag v-if="chatMode === 'agent'" type="info" size="small" class="ml-2">Agent模式</NTag>
       </div>
       <NButton :disabled="sendDisabled" strong circle type="primary" @click="handleSend">
         <template #icon>

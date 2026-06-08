@@ -17,12 +17,17 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
 
   // Agent模式相关状态
   const agentEvents = ref<any[]>([]);
-  const agentStatus = ref<Record<string, {
-    state: 'idle' | 'running' | 'success' | 'error'
-    message: string
-    startTime?: number
-    endTime?: number
-  }>>({});
+  const agentStatus = ref<
+    Record<
+      string,
+      {
+        state: 'idle' | 'running' | 'success' | 'error';
+        message: string;
+        startTime?: number;
+        endTime?: number;
+      }
+    >
+  >({});
 
   // 普通模式WebSocket
   const {
@@ -37,11 +42,18 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
 
   // Agent模式WebSocket连接（手动管理）
   let agentWs: WebSocket | null = null;
-  let agentWsStatus = ref<'CONNECTING' | 'OPEN' | 'CLOSED'>('CLOSED');
+  const agentWsStatus = ref<'CONNECTING' | 'OPEN' | 'CLOSED'>('CLOSED');
 
   const resetAgentTrace = () => {
     agentEvents.value = [];
     agentStatus.value = {};
+  };
+
+  const resetConversationState = () => {
+    input.value.message = '';
+    conversationId.value = '';
+    list.value = [];
+    resetAgentTrace();
   };
 
   // 连接Agent WebSocket
@@ -63,7 +75,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
       console.log('Agent WebSocket连接成功');
     };
 
-    agentWs.onmessage = (event) => {
+    agentWs.onmessage = event => {
       try {
         const data = JSON.parse(event.data);
         console.log('收到Agent事件:', data.type, data.agent, data.message?.substring(0, 50));
@@ -124,7 +136,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
       }
     };
 
-    agentWs.onerror = (error) => {
+    agentWs.onerror = error => {
       console.error('Agent WebSocket错误:', error);
       agentWsStatus.value = 'CLOSED';
     };
@@ -196,6 +208,7 @@ export const useChatStore = defineStore(SetupStoreId.Chat, () => {
     sendMessage,
     connectAgentWs,
     disconnectAgentWs,
-    resetAgentTrace
+    resetAgentTrace,
+    resetConversationState
   };
 });
