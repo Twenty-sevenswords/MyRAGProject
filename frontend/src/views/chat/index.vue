@@ -6,7 +6,7 @@ import AgentDebugPanel from './modules/agent-debug-panel.vue'
 </script>
 
 <template>
-  <div class="flex-col gap-4 relative">
+  <div class="relative h-full min-h-0 flex-col gap-4">
     <ChatList />
     <InputBox />
     <!-- Agent调试面板（自带触发按钮） -->

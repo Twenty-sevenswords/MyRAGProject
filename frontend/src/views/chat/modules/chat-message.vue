@@ -92,7 +92,7 @@ async function handleSourceFileClick(fileName: string) {
 </script>
 
 <template>
-  <div class="mb-8 flex-col gap-2">
+  <div class="chat-message mb-8 flex-col gap-2">
     <div v-if="msg.role === 'user'" class="flex items-center gap-4">
       <NAvatar class="bg-success">
         <SvgIcon icon="ph:user-circle" class="text-icon-large color-white" />
@@ -131,6 +131,28 @@ async function handleSourceFileClick(fileName: string) {
 </template>
 
 <style scoped lang="scss">
+.chat-message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:deep(.markdown-body),
+:deep(.markdown-body *) {
+  max-width: 100%;
+}
+
+:deep(pre),
+:deep(table) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+:deep(p),
+:deep(li),
+:deep(td) {
+  overflow-wrap: anywhere;
+}
+
 :deep(.source-file-link) {
   color: #1890ff;
   cursor: pointer;
@@ -144,6 +166,20 @@ async function handleSourceFileClick(fileName: string) {
   
   &:active {
     color: #096dd9;
+  }
+}
+
+@media (max-width: 639px) {
+  :deep(.ml-12) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.pl-12) {
+    padding-left: 0 !important;
+  }
+
+  :deep(.n-divider) {
+    width: 100% !important;
   }
 }
 </style>

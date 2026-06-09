@@ -8,6 +8,7 @@ defineOptions({
 });
 
 const chatStore = useChatStore();
+const appStore = useAppStore();
 const { list } = storeToRefs(chatStore);
 
 const loading = ref(false);
@@ -57,7 +58,14 @@ onMounted(() => {
 <template>
   <Suspense>
     <NScrollbar ref="scrollbarRef" class="h-0 flex-auto">
-      <Teleport defer to="#header-extra">
+      <div v-if="appStore.isMobile" class="mobile-chat-filter card-wrapper bg-container p-3">
+        <NForm :model="params" label-placement="top" :show-feedback="false">
+          <NFormItem label="时间">
+            <NDatePicker v-model:value="range" type="daterange" class="w-full" />
+          </NFormItem>
+        </NForm>
+      </div>
+      <Teleport v-if="!appStore.isMobile" defer to="#header-extra">
         <div class="px-10">
           <NForm :model="params" label-placement="left" :show-feedback="false" inline>
             <NFormItem label="时间">
@@ -75,4 +83,13 @@ onMounted(() => {
   </Suspense>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.mobile-chat-filter {
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+:deep(.mobile-chat-filter .n-form-item) {
+  margin-bottom: 0;
+}
+</style>

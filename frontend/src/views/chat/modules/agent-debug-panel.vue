@@ -1,8 +1,20 @@
 <template>
-  <n-drawer v-model:show="visible" :width="400" placement="right">
+  <n-drawer v-model:show="visible" :width="drawerWidth" placement="right">
     <n-drawer-content title="🤖 Agent协作监控" :native-scrollbar="false">
 
       <!-- Agent状态卡片 -->
+      <template #header>
+        <div class="debug-drawer-header">
+          <n-button v-if="appStore.isMobile" quaternary size="small" class="debug-back-button" @click="visible = false">
+            <template #icon>
+              <n-icon><svg-icon icon="material-symbols:arrow-back-ios-new-rounded" /></n-icon>
+            </template>
+            返回
+          </n-button>
+          <span class="debug-drawer-title">🤖 Agent协作监控</span>
+        </div>
+      </template>
+
       <n-space v-if="hasAgentStatus" vertical class="agent-cards">
         <n-card
           v-for="(status, agentName) in agentStatus"
@@ -67,9 +79,12 @@
 import { computed } from 'vue'
 
 const chatStore = useChatStore();
+const appStore = useAppStore();
 const { agentEvents, agentStatus, chatMode } = storeToRefs(chatStore);
 
 const visible = ref(false)
+
+const drawerWidth = computed(() => (appStore.isMobile ? '100%' : 400))
 
 const hasAgentStatus = computed(() => Object.keys(agentStatus.value).length > 0)
 
@@ -169,10 +184,35 @@ const formatTime = (timestamp: number) => {
   font-size: 11px;
 }
 
+.debug-drawer-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.debug-back-button {
+  flex-shrink: 0;
+}
+
+.debug-drawer-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .debug-toggle {
   position: fixed;
   right: 20px;
   bottom: 100px;
   z-index: 100;
+}
+
+@media (max-width: 639px) {
+  .debug-toggle {
+    right: 14px;
+    bottom: 88px;
+  }
 }
 </style>

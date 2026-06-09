@@ -40,7 +40,7 @@ function refresh() {
 </script>
 
 <template>
-  <NSpace :align="itemAlign" wrap justify="end" class="lt-sm:w-200px">
+  <NSpace :align="itemAlign" wrap justify="end" class="table-header-operation">
     <slot name="prefix"></slot>
     <slot name="default">
       <NButton v-if="addable" size="small" ghost type="primary" @click="add">
@@ -72,4 +72,11 @@ function refresh() {
   </NSpace>
 </template>
 
-<style scoped></style>
+<style scoped>
+@media (max-width: 639px) {
+  .table-header-operation {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+</style>

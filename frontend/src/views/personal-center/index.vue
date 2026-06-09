@@ -48,8 +48,8 @@ const setPrimaryOrg = async () => {
 
 <template>
   <NSpin :show="loading">
-    <div class="flex-cc">
-      <NCard class="min-h-400px min-w-600px w-50vw card-wrapper" :segmented="{ content: true, footer: 'soft' }">
+    <div class="personal-center-page flex-cc">
+      <NCard class="personal-card min-h-400px w-50vw card-wrapper" :segmented="{ content: true, footer: 'soft' }">
         <template #header>
           <div class="flex items-center gap-4">
             <NAvatar size="large">
@@ -66,7 +66,7 @@ const setPrimaryOrg = async () => {
               size="small"
               embedded
               hoverable
-              class="w-[calc((100%-32px)/3)]"
+              class="org-tag-card w-[calc((100%-32px)/3)]"
               :segmented="{ content: true, footer: 'soft' }"
               @click="showModal(tag.tagId)"
             >
@@ -103,8 +103,39 @@ const setPrimaryOrg = async () => {
 </template>
 
 <style scoped lang="scss">
+.personal-card {
+  min-width: 600px;
+}
+
 :deep(.n-card__content) {
   flex: none m !important;
   height: fit-content;
+}
+
+@media (max-width: 639px) {
+  .personal-center-page {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .personal-card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .org-tag-card {
+    width: 100% !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 900px) {
+  .personal-card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .org-tag-card {
+    width: calc((100% - 16px) / 2) !important;
+  }
 }
 </style>

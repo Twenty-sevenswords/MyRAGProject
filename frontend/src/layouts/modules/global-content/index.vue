@@ -47,7 +47,7 @@ function resetScroll() {
           :is="Component"
           v-if="appStore.reloadFlag"
           :key="tabStore.getTabIdByRoute(route)"
-          :class="{ 'p-[32px_16px_16px_32px]': showPadding }"
+          :class="{ 'layout-content-padding': showPadding }"
           class="flex-grow bg-layout transition-300"
         />
       </KeepAlive>
@@ -55,4 +55,14 @@ function resetScroll() {
   </RouterView>
 </template>
 
-<style></style>
+<style scoped>
+.layout-content-padding {
+  padding: 32px 16px 16px 32px;
+}
+
+@media (max-width: 639px) {
+  .layout-content-padding {
+    padding: 12px 10px;
+  }
+}
+</style>

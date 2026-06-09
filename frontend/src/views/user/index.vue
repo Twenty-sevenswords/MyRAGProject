@@ -96,7 +96,14 @@ function handleOrgTag(row: Api.User.Item) {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <Teleport defer to="#header-extra">
+    <UserSearch
+      v-if="appStore.isMobile"
+      v-model:model="searchParams"
+      class="mobile-user-search"
+      @reset="resetSearchParams"
+      @search="getData"
+    />
+    <Teleport v-else defer to="#header-extra">
       <UserSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getData" />
     </Teleport>
     <NCard title="用户列表" :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">

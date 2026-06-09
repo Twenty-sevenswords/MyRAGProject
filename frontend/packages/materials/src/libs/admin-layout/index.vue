@@ -71,6 +71,12 @@ const isHorizontal = computed(() => props.mode === 'horizontal');
 
 const fixedHeaderAndTab = computed(() => props.fixedTop || (isHorizontal.value && isWrapperScroll.value));
 
+const fixedHeaderClass = computed(() => {
+  if (!fixedHeaderAndTab.value) return '';
+
+  return props.isMobile ? 'absolute left-2 right-2 top-2 w-auto' : 'absolute top-4 right-4 w-full';
+});
+
 // css
 const leftGapClass = computed(() => {
   if (!props.fullContent && showSider.value) {
@@ -129,7 +135,7 @@ function handleClickMask() {
             commonClass,
             headerClass,
             headerLeftGapClass,
-            { 'absolute top-4 right-4 w-full': fixedHeaderAndTab }
+            fixedHeaderClass
           ]"
         >
           <slot name="header"></slot>
@@ -182,7 +188,7 @@ function handleClickMask() {
       <!-- Mobile Sider -->
       <template v-if="showMobileSider">
         <aside
-          class="absolute left-0 top-0 h-full w-0 bg-white"
+          class="absolute left-0 top-0 h-full w-0 bg-container"
           :class="[
             commonClass,
             mobileSiderClass,
@@ -203,7 +209,7 @@ function handleClickMask() {
       <!-- Main Content -->
       <main
         :id="isContentScroll ? scrollElId : undefined"
-        class="flex flex-col flex-grow"
+        class="min-h-0 min-w-0 flex flex-col flex-grow"
         :class="[commonClass, contentClass, leftGapClass, { 'overflow-y-auto': isContentScroll }]"
       >
         <slot></slot>

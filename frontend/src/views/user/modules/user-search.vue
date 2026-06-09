@@ -22,8 +22,8 @@ async function search() {
 </script>
 
 <template>
-  <NCard :bordered="false" size="small" class="rd-full px-6">
-    <NForm ref="formRef" :model="model" label-placement="left" :show-feedback="false" inline>
+  <NCard :bordered="false" size="small" class="user-search-card rd-full px-6">
+    <NForm ref="formRef" :model="model" label-placement="left" :show-feedback="false" inline class="user-search-form">
       <NFormItem label="关键词" path="keyword">
         <NInput v-model:value="model.keyword" placeholder="请输入关键词" clearable />
       </NFormItem>
@@ -43,4 +43,30 @@ async function search() {
   </NCard>
 </template>
 
-<style scoped></style>
+<style scoped>
+.user-search-form {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 639px) {
+  .user-search-card {
+    border-radius: 12px;
+    padding-inline: 0;
+  }
+
+  .user-search-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :deep(.n-form-item) {
+    margin-right: 0;
+  }
+
+  :deep(.n-input),
+  :deep(.n-base-selection),
+  :deep(.n-cascader) {
+    width: 100%;
+  }
+}
+</style>

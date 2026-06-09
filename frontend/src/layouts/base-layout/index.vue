@@ -67,6 +67,22 @@ const siderWidth = computed(() => getSiderWidth());
 
 const siderCollapsedWidth = computed(() => getSiderCollapsedWidth());
 
+const layoutSiderWidth = computed(() => (appStore.isMobile ? 248 : siderWidth.value));
+
+const layoutContentClass = computed(() => {
+  const classes: string[] = [];
+
+  if (appStore.contentXScrollable || appStore.isMobile) {
+    classes.push('overflow-x-hidden');
+  }
+
+  if (appStore.isMobile) {
+    classes.push('min-w-0');
+  }
+
+  return classes.join(' ');
+});
+
 function getSiderWidth() {
   const { reverseHorizontalMix } = themeStore.layout;
   const { width, mixWidth, mixChildMenuWidth } = themeStore.sider;
@@ -114,9 +130,9 @@ function getSiderCollapsedWidth() {
     :header-height="themeStore.header.height"
     :tab-visible="themeStore.tab.visible"
     :tab-height="themeStore.tab.height"
-    :content-class="appStore.contentXScrollable ? 'overflow-x-hidden' : ''"
+    :content-class="layoutContentClass"
     :sider-visible="siderVisible"
-    :sider-width="siderWidth"
+    :sider-width="layoutSiderWidth"
     :sider-collapsed-width="siderCollapsedWidth"
     :footer-visible="themeStore.footer.visible"
     :footer-height="themeStore.footer.height"

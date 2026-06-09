@@ -172,16 +172,16 @@ const handShortcut = (e: KeyboardEvent) => {
 </script>
 
 <template>
-  <div class="relative w-full b-1 b-#1c1c1c20 bg-#fff p-4 card-wrapper dark:bg-#1c1c1c">
+  <div class="chat-input-card relative w-full b-1 b-#1c1c1c20 bg-#fff p-4 card-wrapper dark:bg-#1c1c1c">
     <!-- 模式切换栏 -->
-    <div class="mb-2 flex items-center justify-between">
-      <NRadioGroup v-model:value="chatMode" size="small" @update:value="handleModeChange">
+    <div class="chat-input-header mb-2 flex items-center justify-between">
+      <NRadioGroup v-model:value="chatMode" size="small" class="chat-mode-group" @update:value="handleModeChange">
         <NRadioButton value="normal">💬 普通问答</NRadioButton>
         <NRadioButton value="agent">🤖 Agent协作</NRadioButton>
       </NRadioGroup>
 
       <!-- Agent模式提示 -->
-      <NText v-if="chatMode === 'agent'" depth="3" class="text-12px">
+      <NText v-if="chatMode === 'agent'" depth="3" class="session-hint text-12px">
         会话: {{ currentSessionId.slice(0, 12) }}...
       </NText>
     </div>
@@ -193,8 +193,8 @@ const handShortcut = (e: KeyboardEvent) => {
       class="min-h-10 w-full cursor-text resize-none b-none bg-transparent color-#333 caret-[rgb(var(--primary-color))] outline-none dark:color-#f1f1f1"
       @keydown="handShortcut"
     />
-    <div class="flex items-center justify-between pt-2">
-      <div class="flex items-center gap-3 text-18px color-gray-500">
+    <div class="chat-input-footer flex items-center justify-between pt-2">
+      <div class="chat-input-meta flex items-center gap-3 text-18px color-gray-500">
         <NButton
           size="small"
           tertiary
@@ -225,4 +225,52 @@ const handShortcut = (e: KeyboardEvent) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.chat-input-card,
+.chat-input-header,
+.chat-input-footer,
+.chat-input-meta {
+  min-width: 0;
+}
+
+.chat-input-meta {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 639px) {
+  .chat-input-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .chat-input-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chat-mode-group {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .session-hint {
+    display: none;
+  }
+
+  .chat-input-footer {
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .chat-input-meta {
+    flex: 1;
+    gap: 8px;
+    font-size: 16px;
+  }
+
+  :deep(.chat-mode-group .n-radio-button) {
+    padding-inline: 10px;
+  }
+}
+</style>

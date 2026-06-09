@@ -11,6 +11,7 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
+const appStore = useAppStore();
 const knowledgeBaseStore = useKnowledgeBaseStore();
 const { routerPushByKey, toLogin } = useRouterPush();
 const { SvgIconVNode } = useSvgIcon();
@@ -75,7 +76,7 @@ function handleDropdown(key: DropdownKey) {
     <div>
       <ButtonIcon>
         <SvgIcon icon="ph:user-circle" class="text-icon-large" />
-        <span class="text-16px font-medium">{{ authStore.userInfo.username }}</span>
+        <span v-if="!appStore.isMobile" class="text-16px font-medium">{{ authStore.userInfo.username }}</span>
       </ButtonIcon>
     </div>
   </NDropdown>

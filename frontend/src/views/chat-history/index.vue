@@ -13,6 +13,7 @@ const list = ref<Api.Chat.Message[]>([]);
 const loading = ref(false);
 
 const store = useAuthStore();
+const appStore = useAppStore();
 
 watch(() => [...list.value], scrollToBottom);
 
@@ -56,8 +57,27 @@ async function getList() {
 </script>
 
 <template>
-  <div class="h-full">
-    <Teleport defer to="#header-extra">
+  <div class="h-full min-h-0 flex-col gap-3">
+    <div v-if="appStore.isMobile" class="mobile-history-filter card-wrapper bg-container p-3">
+      <NForm :model="params" label-placement="top" :show-feedback="false">
+        <NFormItem label="用户">
+          <TheSelect
+            v-model:value="userId"
+            url="admin/users/list"
+            :params="{ page: 1, size: 999, orgTag: store.userInfo.primaryOrg }"
+            key-field="content"
+            value-field="userId"
+            label-field="username"
+            class="clear w-full!"
+            :clearable="false"
+          />
+        </NFormItem>
+        <NFormItem label="时间">
+          <NDatePicker v-model:value="range" type="daterange" class="clear w-full" />
+        </NFormItem>
+      </NForm>
+    </div>
+    <Teleport v-if="!appStore.isMobile" defer to="#header-extra">
       <div class="px-10">
         <NForm :model="params" label-placement="left" :show-feedback="false" inline>
           <NFormItem label="用户">
@@ -78,7 +98,7 @@ async function getList() {
         </NForm>
       </div>
     </Teleport>
-    <NScrollbar ref="scrollbarRef">
+    <NScrollbar ref="scrollbarRef" class="h-0 flex-auto">
       <NSpin :show="loading" class="h-full">
         <VueMarkdownItProvider>
           <ChatMessage v-for="(item, index) in list" :key="index" :msg="item" />
@@ -89,4 +109,13 @@ async function getList() {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.mobile-history-filter {
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+:deep(.mobile-history-filter .n-form-item:last-child) {
+  margin-bottom: 0;
+}
+</style>
